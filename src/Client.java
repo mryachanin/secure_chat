@@ -47,14 +47,14 @@ public class Client extends Thread {
 
                 boolean allowed = ui.requestConnection(ip);
                 if(!allowed) {
-                    out.println("Refused connection from " + ip);
+                    out.println("#### Refused connection from " + ip + " ####");
                     try {
                         clientSocket.close();
                     } catch (IOException e) { e.printStackTrace(); }
                     return;
                 } else {
                     connect(clientSocket, ip);
-                    out.println("You are now connected to " + ip);
+                    out.println("#### You are now connected to " + ip + " ####");
                 }
             } catch (IOException e) { e.printStackTrace(); }
         }
