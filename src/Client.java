@@ -7,6 +7,13 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
 
+/**
+ *  Defines a client that can accept connections, request connections,
+ *      and send data securely over connections to other clients. 
+ *      
+ *  When this thread starts, it will:
+ *      Continuously listen for commands and execute them
+ */
 public class Client extends Thread {
     private ChatInterface ui;
     private ArrayList<Connection> connections;
@@ -16,6 +23,13 @@ public class Client extends Thread {
     private PrintWriter out;
     private Server server;
 
+    /**
+     *  Initializes variables
+     *  Starts server thread
+     *  Starts main thread
+     *  
+     *  @param ui Defines the user interface
+     */
     public Client(ChatInterface ui) {
         this.ui = ui;
         connections = new ArrayList<Connection>();
@@ -27,10 +41,23 @@ public class Client extends Thread {
         start();
     }
     
+    /**
+     *  Defines a server that will constantly listen for connection requests
+     *
+     *  When started as a thread, this will:
+     *      Continuously listen for new connection requests.
+     *      When a new connection is found, the server will request the user to 
+     *          accept the connection. If the user accepts, a new connection is
+     *          made; else, the socket is closed
+     */
     private class Server extends Thread {
         private ServerSocket serverSocket;
         private int serverPort = 0;
 
+        /**
+         *  Instantiates a new server socket
+         *  Prints the port it was started on
+         */
         public Server() {
             try {
                 serverSocket = new ServerSocket(serverPort);
@@ -38,6 +65,7 @@ public class Client extends Thread {
             } catch (IOException e) { e.printStackTrace(); }     
         }
         
+        @Override
         public void run() {
             Socket clientSocket;
             try {
@@ -59,6 +87,7 @@ public class Client extends Thread {
         }
     }
     
+    @Override
     public void run() {
         String input;
         try {
@@ -122,10 +151,17 @@ public class Client extends Thread {
         }
     }
     
-    private void acceptConnection(String connectionName) {
+    /**
+     *  Called with /accept
+     *  
+     *  Allows a connection to be instantiated
+     * 
+     *  @param connectionRequestName Name of the request to accept
+     */
+    private void acceptConnection(String connectionRequestName) {
         synchronized(pendingConnections) {
             for(ConnectionRequest cr: pendingConnections) {
-                if(cr.equals(connectionName)) {
+                if(cr.equals(connectionRequestName)) {
                     cr.setAccepted(true);
                     synchronized(cr) {
                         cr.notify();
@@ -137,9 +173,19 @@ public class Client extends Thread {
         }
     }
     
-    private void connect(String ip, int port, String name) {
+    /**
+     *  Called with /connect
+     *  
+     *  passes overloaded method a new socket and the connection name to
+     *      instantiate a new connection
+     *  
+     *  @param ip IP Address of the socket for a new connection
+     *  @param port Port of the socket for a new connection
+     *  @param connectionName Name of the connection for ease of reference
+     */
+    private void connect(String ip, int port, String connectionName) {
         try {
-            connect(new Socket(ip, port), name);
+            connect(new Socket(ip, port), connectionName);
         } catch (ConnectException e) {
             out.println("#### Connection Refused ####");
         } catch(IOException e) {
@@ -147,12 +193,25 @@ public class Client extends Thread {
         }
     }
 
-    private void connect(Socket s, String name) {
-        Connection newConnection = new Connection(s, name, out);
-        map.put(name, newConnection);
+    /**
+     *  Instantiates a new connection and associates it with a connection name
+     * 
+     *  @param s Socket for a new connection
+     *  @param connectionName Name of the connection for ease of reference
+     */
+    private void connect(Socket s, String connectionName) {
+        Connection newConnection = new Connection(s, connectionName, out);
+        map.put(connectionName, newConnection);
         connections.add(newConnection);
     }
 
+    /**
+     *  Called with /decline
+     *  
+     *  Does not allow a connection to be instantiated
+     * 
+     *  @param connectionRequestName Name of the request to decline
+     */
     private void declineConnection(String connectionName) {
         synchronized(pendingConnections) {
             for(ConnectionRequest cr: pendingConnections) {
@@ -167,6 +226,13 @@ public class Client extends Thread {
         }
     }
 
+    /**
+     *  Called with /disconnect
+     *  
+     *  Disconnect a current connection
+     *  
+     *  @param connectionName Name of the connection to disconnect from
+     */
     private void disconnect(String connectionName) {
         try {
             connections.remove(map.get(connectionName));
@@ -175,25 +241,36 @@ public class Client extends Thread {
         }
     }
     
+    /**
+     *  Prints the names of all currently accepted connections
+     */
     private void printAcceptedConnections() {
         out.println("#### Connected To ####");
         for(Connection con: connections) {
             if(con.isClosed())
                 connections.remove(con);
             else
-                out.println(con.toString());
+                out.println(con.getConnectionName());
         }
     }
     
+    /**
+     *  Prints the names of all pending connections
+     */
     private void printPendingConnections() {
         out.println("#### Pending Connections ####");
         synchronized(pendingConnections) {
             for(ConnectionRequest cr: pendingConnections) {
-                out.println(cr.toString());
+                out.println(cr.getConnectionName());
             }
         }
     }
     
+    /**
+     *  Continuously sends messages to a connection until user types '/close'
+     * 
+     *  @param connectionName Name of the connection to send messages
+     */
     private void sendMessage(String connectionName) {
         try {
             Connection c = map.get(connectionName);
@@ -209,7 +286,12 @@ public class Client extends Thread {
         }
     }
     
+    /**
+     *  Instantiates a new client using the command interface
+     *  
+     *  @param args These will all be ignored
+     */
     public static void main(String[] args) {
-        Client c1 = new Client(new CommandInterface());
+        new Client(new CommandInterface());
     }
 }

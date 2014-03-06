@@ -3,17 +3,23 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-
+/**
+ *  Interface meant to be used with the command line
+ */
 public class CommandInterface implements ChatInterface {
     BufferedReader in;
     PrintWriter out;
     ArrayList<ConnectionRequest> pendingConnections;
     
+    /**
+     *  Initializes the default input and output stream (system.in / system.out)
+     */
     public CommandInterface() {
         in = new BufferedReader(new InputStreamReader(System.in));
         out = new PrintWriter(System.out, true);
         pendingConnections = new ArrayList<ConnectionRequest>();
     }
+    
     @Override
     public boolean requestConnection(String connectionName) {
         ConnectionRequest request = new ConnectionRequest(connectionName);
@@ -39,6 +45,7 @@ public class CommandInterface implements ChatInterface {
         return out;
     }
     
+    @Override
     public ArrayList<ConnectionRequest> getPendingConnections() {
         return pendingConnections;
     }

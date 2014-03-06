@@ -31,6 +31,12 @@ public interface ChatInterface {
 	 */
 	public PrintWriter getOutput();
 	
+	/**
+	 *  Connection requests from other clients
+	 * 
+	 *  @return ArrayList of connectionRequest objects that represent 
+	 *          current pending connections
+	 */
 	public ArrayList<ConnectionRequest> getPendingConnections();
 
 }
