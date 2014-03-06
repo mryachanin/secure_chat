@@ -51,7 +51,6 @@ public class Client extends Thread {
                     try {
                         clientSocket.close();
                     } catch (IOException e) { e.printStackTrace(); }
-                    return;
                 } else {
                     connect(clientSocket, ip);
                     out.println("#### You are now connected to " + ip + " ####");
@@ -67,11 +66,11 @@ public class Client extends Thread {
                 String[] inputArray = input.toLowerCase().split("\\s+");
                 pendingConnections = ui.getPendingConnections();
                 switch(inputArray[0]) {
-                    case "accept":
+                    case "/accept":
                         acceptConnection(inputArray[1]);
                         break;
 
-                    case "connect":
+                    case "/connect":
                         try {
                             connect(inputArray[1], 
                                         Integer.parseInt(inputArray[2]), 
@@ -82,39 +81,39 @@ public class Client extends Thread {
                         }
                         break;
 
-                    case "decline":
+                    case "/decline":
                         declineConnection(inputArray[1]);
                         break;
 
-                    case "disconnect":
+                    case "/disconnect":
                         disconnect(inputArray[1]);
                         break;
 
-                    case "list":
+                    case "/list":
                         printAcceptedConnections();
                         break;
    
-                    case "msg":
+                    case "/msg":
                         sendMessage(inputArray[1]);
                         break;
                     
-                    case "pending":
+                    case "/pending":
                         printPendingConnections();
                         break;
                         
-                    case "quit":
+                    case "/quit":
                         System.exit(0);
                         
                     default:
                         out.println("Valid commands:");
-                        out.print("accept <ip>");
-                        out.print("connect <ip> <port> <nickname>");
-                        out.print("decline <ip>");
-                        out.print("disconnect <ip/nickname>");
-                        out.println("list");
-                        out.println("msg <ip/nickname>");
-                        out.println("pending");
-                        out.println("quit");
+                        out.print("/accept <ip>");
+                        out.print("/connect <ip> <port> <nickname>");
+                        out.print("/decline <ip>");
+                        out.print("/disconnect <ip/nickname>");
+                        out.println("/list");
+                        out.println("/msg <ip/nickname>");
+                        out.println("/pending");
+                        out.println("/quit");
                         break;
                 }
             }
@@ -144,12 +143,12 @@ public class Client extends Thread {
         } catch (ConnectException e) {
             out.println("#### Connection Refused ####");
         } catch(IOException e) {
-            out.println("Usage: connect <ip> <port> <name>");
+            out.println("Usage: /connect <ip> <port> <name>");
         }
     }
 
     private void connect(Socket s, String name) {
-        Connection newConnection = new Connection(s, name, in, out);
+        Connection newConnection = new Connection(s, name, out);
         map.put(name, newConnection);
         connections.add(newConnection);
     }
@@ -172,7 +171,7 @@ public class Client extends Thread {
         try {
             connections.remove(map.get(connectionName));
         } catch(Exception e) {
-            out.println("Usage: disconnect <ip/nickname>");
+            out.println("Usage: /disconnect <ip/nickname>");
         }
     }
     
@@ -200,12 +199,12 @@ public class Client extends Thread {
             Connection c = map.get(connectionName);
             while(true) {
                 String msg = in.readLine();
-                if(msg.equals("close"))
+                if(msg.equals("/close"))
                     break;
                 c.sendMessage(msg);
             }
         } catch(Exception e) {
-            out.println("Usage: msg <name>");
+            out.println("Usage: /msg <name>");
             e.printStackTrace();
         }
     }

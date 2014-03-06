@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -7,16 +8,17 @@ import java.net.Socket;
 public class Connection extends Thread {
     private Socket s;
     private BufferedReader in;
-    private PrintWriter out, send_message;
+    private PrintWriter sysout, out;
     private String name;
     
-    public Connection(Socket s, String name, BufferedReader in, PrintWriter out) {
+    public Connection(Socket s, String name, PrintWriter out) {
         this.s = s;
         this.name = name;
-        this.out = out;
-        this.in = in;
+        this.sysout = out;
         try {
-            this.send_message = new PrintWriter(s.getOutputStream(), true);
+            this.in = new BufferedReader(
+                          new InputStreamReader(s.getInputStream()));
+            this.out = new PrintWriter(s.getOutputStream(), true);
         } catch (IOException e) { e.printStackTrace(); }
         start();
     }
@@ -25,14 +27,14 @@ public class Connection extends Thread {
         try {
             String line;
             while((line = in.readLine()) != null) {
-                out.println(line);
+                sysout.println(line);
             }
             s.close();
         } catch(IOException e) { e.printStackTrace(); }
     }
     
     public void sendMessage(String message) {
-        send_message.println(message);
+        out.println(message);
     }
     
     public String toString() {
