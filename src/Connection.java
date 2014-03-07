@@ -7,15 +7,19 @@ import java.net.Socket;
 /**
  *  Defines a connection
  *
- *  When this thread starts, it will continuously probe for input from the 
- *      socket associated with this connection and print the input to the user.
- *      When the BufferedReader returns null, the socket is closed
+ *  When this thread starts, it will prompt the user to accept the connection.
+ *      If the connection is accepted, the thread will continuously probe for 
+ *      input from the socket associated with this connection and print the 
+ *      input to the user. When the BufferedReader returns null, the socket is 
+ *      closed
+ *      If the user does not accept the connection, the socket is closed. 
  */
 public class Connection extends Thread {
     private Socket s;
     private BufferedReader in;
     private PrintWriter sysout, out;
     private String name;
+    private ChatInterface ui;
     
     /**
      *  Initializes variables
@@ -25,10 +29,11 @@ public class Connection extends Thread {
      *  @param name   Name of this connection
      *  @param sysout Output stream to user
      */
-    public Connection(Socket s, String name, PrintWriter sysout) {
+    public Connection(Socket s, String name, PrintWriter sysout, ChatInterface ui) {
         this.s = s;
         this.name = name;
         this.sysout = sysout;
+        this.ui = ui;
         try {
             this.in = new BufferedReader(
                           new InputStreamReader(s.getInputStream()));
@@ -38,13 +43,22 @@ public class Connection extends Thread {
     }
     
     public void run() {
-        try {
-            String line;
-            while((line = in.readLine()) != null) {
-                sysout.println(line);
-            }
-            s.close();
-        } catch(IOException e) { e.printStackTrace(); }
+        boolean allowed = ui.requestConnection(s.getInetAddress().getHostAddress());
+        if(!allowed) {
+            out.println("#### Refused connection from " + s.getInetAddress().getHostAddress() + " ####");
+            try {
+                s.close();
+            } catch (IOException e) { e.printStackTrace(); }
+        } else {
+            out.println("#### You are now connected to " + s.getInetAddress().getHostAddress() + " ####");
+            try {
+                String line;
+                while((line = in.readLine()) != null) {
+                    sysout.println(line);
+                }
+                s.close();
+            } catch(IOException e) { e.printStackTrace(); }
+        }
     }
     
     /**

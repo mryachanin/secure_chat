@@ -2,7 +2,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class Client extends Thread {
     private ChatInterface ui;
     private ArrayList<Connection> connections;
     private ArrayList<ConnectionRequest> pendingConnections;
-    private Hashtable<String,Connection> map;
+    private HashMap<String,Connection> map;
     private BufferedReader in;
     private PrintWriter out;
     private Server server;
@@ -33,7 +33,7 @@ public class Client extends Thread {
     public Client(ChatInterface ui) {
         this.ui = ui;
         connections = new ArrayList<Connection>();
-        map = new Hashtable<String,Connection>();
+        map = new HashMap<String,Connection>();
         in = ui.getInput();
         out = ui.getOutput();
         server = new Server();
@@ -46,9 +46,9 @@ public class Client extends Thread {
      *
      *  When started as a thread, this will:
      *      Continuously listen for new connection requests.
-     *      When a new connection is found, the server will request the user to 
-     *          accept the connection. If the user accepts, a new connection is
-     *          made; else, the socket is closed
+     *      When a new connection is found, the server will create a new 
+     *          Connection object. All validation is handled in the Connection 
+     *          object so multiple requests can be pending at once.
      */
     private class Server extends Thread {
         private ServerSocket serverSocket;
@@ -72,17 +72,7 @@ public class Client extends Thread {
                 clientSocket = serverSocket.accept();
                 String ip = clientSocket.getInetAddress().toString();
                 out.println("#### Incoming Request From " + ip + " ####");
-
-                boolean allowed = ui.requestConnection(ip);
-                if(!allowed) {
-                    out.println("#### Refused connection from " + ip + " ####");
-                    try {
-                        clientSocket.close();
-                    } catch (IOException e) { e.printStackTrace(); }
-                } else {
-                    connect(clientSocket, ip);
-                    out.println("#### You are now connected to " + ip + " ####");
-                }
+                connect(clientSocket, ip);
             } catch (IOException e) { e.printStackTrace(); }
         }
     }
@@ -161,7 +151,7 @@ public class Client extends Thread {
     private void acceptConnection(String connectionRequestName) {
         synchronized(pendingConnections) {
             for(ConnectionRequest cr: pendingConnections) {
-                if(cr.equals(connectionRequestName)) {
+                if(cr.getConnectionName().equals(connectionRequestName)) {
                     cr.setAccepted(true);
                     synchronized(cr) {
                         cr.notify();
@@ -200,7 +190,7 @@ public class Client extends Thread {
      *  @param connectionName Name of the connection for ease of reference
      */
     private void connect(Socket s, String connectionName) {
-        Connection newConnection = new Connection(s, connectionName, out);
+        Connection newConnection = new Connection(s, connectionName, out, ui);
         map.put(connectionName, newConnection);
         connections.add(newConnection);
     }
@@ -215,7 +205,7 @@ public class Client extends Thread {
     private void declineConnection(String connectionName) {
         synchronized(pendingConnections) {
             for(ConnectionRequest cr: pendingConnections) {
-                if(cr.equals(connectionName)) {
+                if(cr.getConnectionName().equals(connectionName)) {
                     synchronized(cr) {
                         cr.notify();
                     }

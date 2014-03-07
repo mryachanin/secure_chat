@@ -33,16 +33,6 @@ public class ConnectionRequest {
     }
     
     /**
-     *  Checks if the string passed in is equal to this connection name
-     *  
-     *  @param connectionName Name of the connection associated with this request.
-     *  @return true: connectionName = this.name; else false
-     */
-    public boolean equals(String connectionName) {
-        return this.connectionName.equals(connectionName);
-    }
-    
-    /**
      *  Returns the name of the connection this request is associated with
      * 
      *  @return Name of the connection this request is associated with
