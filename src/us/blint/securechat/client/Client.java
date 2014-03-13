@@ -26,7 +26,7 @@ public class Client extends Thread {
     //private static void setChatInteface(ChatInterface ui) {
     //    Client.ui = ui;
     //}
-    public static ChatInterface getChatInteface() {
+    public static ChatInterface getChatInterface() {
         return Client.ui;
     }
     

@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import us.blint.securechat.client.Client;
 import us.blint.securechat.connection.ConnectionManager;
 import us.blint.securechat.ui.ChatInterface;
+import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
+import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
 
 /**
  *  Defines a server that will constantly listen for connection requests
@@ -28,9 +31,10 @@ public class Server extends Thread {
      */
     public Server() {
         cm = ConnectionManager.getInstance();
+        ui = Client.getChatInterface();
         try {
             serverSocket = new ServerSocket(serverPort);
-            //this.out.println("Server started on: " + serverSocket.getLocalPort());
+            ui.send(new DisplayServerStartPacket(serverSocket.getLocalPort()));
         } catch (IOException e) { e.printStackTrace(); }     
     }
     
@@ -40,7 +44,7 @@ public class Server extends Thread {
         try {
             clientSocket = serverSocket.accept();
             String ip = clientSocket.getInetAddress().toString();
-            //out.println("#### Incoming Request From " + ip + " ####");
+            ui.send(new DisplayConnectionRequestPacket(ip));
             cm.connect(clientSocket, ip);
         } catch (IOException e) { e.printStackTrace(); }
     }

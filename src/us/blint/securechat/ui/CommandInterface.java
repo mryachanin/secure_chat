@@ -20,8 +20,10 @@ import us.blint.securechat.ui.packet.command.SendMessagePacket;
 import us.blint.securechat.ui.packet.display.DisplayAcceptedConnectionsPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
+import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
 import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 import us.blint.securechat.ui.packet.display.DisplayPendingConnectionsPacket;
+import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
 import us.blint.securechat.ui.packet.error.ConnectErrorPacket;
 import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
 import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
@@ -143,6 +145,14 @@ public class CommandInterface implements ChatInterface {
     	else if(p instanceof DisplayConnectionDeclinedPacket) {
         	out.println("#### Declined connection from " + ((DisplayConnectionDeclinedPacket)p).getConnectionName() + " ####");
         }
+    	
+    	else if(p instanceof DisplayServerStartPacket) {
+    		out.println("#### Server started on port: " + ((DisplayServerStartPacket)p).getPort() + " ####");
+    	}
+    	
+    	else if(p instanceof DisplayConnectionRequestPacket) {
+    		out.println("#### Incoming Request From " + ((DisplayConnectionRequestPacket)p).getConnectionName() + " ####");
+    	}
         
     	else if(p instanceof ConnectionRefusedErrorPacket) {
         	out.println("#### "+ ((ConnectionRefusedErrorPacket)p).getConnectionName() + " declined your connection request ####");

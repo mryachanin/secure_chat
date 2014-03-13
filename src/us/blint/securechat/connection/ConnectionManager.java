@@ -29,7 +29,7 @@ public class ConnectionManager {
     private HashMap<String,Connection> connectionMap;
 
     private ConnectionManager() {
-        this.ui = Client.getChatInteface();
+        this.ui = Client.getChatInterface();
         connections = new ArrayList<Connection>();
         connectionMap = new HashMap<String,Connection>();
     }
