@@ -1,3 +1,4 @@
+package us.blint.securechat.connection;
 /**
  *  Stores the name of a pending request and the state of that request.
  */

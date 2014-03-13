@@ -1,8 +1,14 @@
+package us.blint.securechat.connection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+
+import us.blint.securechat.ui.ChatInterface;
+import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
+import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
+import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 
 /**
  *  Defines a connection
@@ -17,8 +23,9 @@ import java.net.Socket;
 public class Connection extends Thread {
     private Socket s;
     private BufferedReader in;
-    private PrintWriter sysout, out;
-    private String name;
+    private PrintWriter out;
+    private String connectionName;
+    private ConnectionManager cm;
     private ChatInterface ui;
     
     /**
@@ -28,11 +35,12 @@ public class Connection extends Thread {
      *  @param s      Socket between the client and another user
      *  @param name   Name of this connection
      *  @param sysout Output stream to user
+     *  @param ui     Defines the user interface
      */
-    public Connection(Socket s, String name, PrintWriter sysout, ChatInterface ui) {
+    public Connection(Socket s, String connectionName, ConnectionManager cm, ChatInterface ui) {
         this.s = s;
-        this.name = name;
-        this.sysout = sysout;
+        this.connectionName = connectionName;
+        this.cm = cm;
         this.ui = ui;
         try {
             this.in = new BufferedReader(
@@ -43,18 +51,18 @@ public class Connection extends Thread {
     }
     
     public void run() {
-        boolean allowed = ui.requestConnection(s.getInetAddress().getHostAddress());
+        boolean allowed = cm.requestConnection(connectionName);
         if(!allowed) {
-            out.println("#### Refused connection from " + s.getInetAddress().getHostAddress() + " ####");
+            ui.send(new DisplayConnectionDeclinedPacket(connectionName));
             try {
                 s.close();
             } catch (IOException e) { e.printStackTrace(); }
         } else {
-            out.println("#### You are now connected to " + s.getInetAddress().getHostAddress() + " ####");
+            ui.send(new DisplayConnectionAcceptedPacket(connectionName));
             try {
                 String line;
                 while((line = in.readLine()) != null) {
-                    sysout.println(line);
+                    ui.send(new DisplayMessagePacket(line, connectionName));
                 }
                 s.close();
             } catch(IOException e) { e.printStackTrace(); }
@@ -76,7 +84,7 @@ public class Connection extends Thread {
      *  @return Name of this connection
      */
     public String getConnectionName() {
-        return name;
+        return connectionName;
     }
     
     /**
