@@ -22,7 +22,6 @@ import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
  *      If the user does not accept the connection, the socket is closed. 
  */
 public class Connection extends Thread {
-    private String id;
     private Socket s;
     private BufferedReader in;
     private PrintWriter out;
@@ -42,7 +41,6 @@ public class Connection extends Thread {
      *  @param connectionManager    Manages all connections
      */
     public Connection(Socket s, String connectionName, int connectionNumber, ConnectionManager cm) {
-        this.id = new String(id);
         this.s = s;
         this.connectionName = connectionName;
         this.connectionNumber = connectionNumber;

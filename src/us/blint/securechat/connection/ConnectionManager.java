@@ -35,6 +35,7 @@ public class ConnectionManager {
     private ConnectionManager() {
         this.ui = Client.getChatInterface();
         connections = new ArrayList<Connection>();
+        pendingConnections = new ArrayList<ConnectionRequest>();
         connectionMap = new HashMap<String,Connection>();
         connectionNumber = 0;
     }
