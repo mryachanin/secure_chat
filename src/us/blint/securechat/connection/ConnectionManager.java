@@ -30,14 +30,12 @@ public class ConnectionManager {
     private ArrayList<Connection> connections;
     private ArrayList<ConnectionRequest> pendingConnections;
     private HashMap<String,Connection> connectionMap;
-    private int connectionNumber;
     
     private ConnectionManager() {
         this.ui = Client.getChatInterface();
         connections = new ArrayList<Connection>();
         pendingConnections = new ArrayList<ConnectionRequest>();
         connectionMap = new HashMap<String,Connection>();
-        connectionNumber = 0;
     }
 
     /**
@@ -48,8 +46,8 @@ public class ConnectionManager {
      *
      *  @return true is the user accepts the connection, false otherwise
      */
-    public boolean requestConnection(String connectionName, int connectionNumber) {
-        ConnectionRequest request = new ConnectionRequest(connectionName, connectionNumber);
+    public boolean requestConnection(String connectionName, int port) {
+        ConnectionRequest request = new ConnectionRequest(connectionName, port);
         synchronized(pendingConnections) {
             pendingConnections.add(request);
         }
@@ -66,12 +64,12 @@ public class ConnectionManager {
      *  Allows messages to be received through the socket associated with this
      *  Connection id
      * 
-     *  @param connectionNumber Unique id of the request to accept
+     *  @param connectionName Name of the connection to accept
      */
-    public void acceptConnection(int connectionNumber) {
+    public void acceptConnection(String ip, int port, String connectionName) {
         synchronized(pendingConnections) {
             for(ConnectionRequest cr: pendingConnections) {
-                if(cr.getConnectionNumber() == connectionNumber) {
+                if(cr.getip().equals(ip) && cr.getPort() == port) {
                     cr.setAccepted(true);
                     synchronized(cr) {
                         cr.notify();
@@ -81,18 +79,19 @@ public class ConnectionManager {
                 }
             }
         }
+        connectionMap.get(ip).setConnectionName(connectionName);
     }
     
     /**
      *  Does not allow traffic to be received through the socket associated 
      *  with this Connection id
      * 
-     *  @param connectionNumber Unique id of the request to decline
+     *  @param connectionName Name of the connection to decline
      */
-    public void declineConnection(int connectionNumber) {
+    public void declineConnection(String ip, int port) {
         synchronized(pendingConnections) {
             for(ConnectionRequest cr: pendingConnections) {
-                if(cr.getConnectionNumber() == connectionNumber) {
+                if(cr.getip().equals(ip) && cr.getPort() == port) {
                     synchronized(cr) {
                         cr.notify();
                     }
@@ -128,7 +127,7 @@ public class ConnectionManager {
      *  @param  connectionName Name of the connection for ease of reference
      */
     public void connect(Socket s, String connectionName) {
-        Connection newConnection = new Connection(s, connectionName, getNextConnectionNumber(), this);
+        Connection newConnection = new Connection(s, connectionName, this);
         connectionMap.put(connectionName, newConnection);
         connections.add(newConnection);
     }
@@ -154,14 +153,5 @@ public class ConnectionManager {
      */
     public void sendMessage(String connectionName, String message) {
         connectionMap.get(connectionName).sendMessage(message);
-    }
-    
-    /**
-     *  Provides a unique id and increments that id in preparation for the next call
-     *  
-     *  @return Unique id to associate with a connection
-     */
-    public int getNextConnectionNumber() {
-        return connectionNumber++;
     }
 }

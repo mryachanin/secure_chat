@@ -3,14 +3,20 @@ package us.blint.securechat.ui.packet.command;
 import us.blint.securechat.ui.packet.Packet;
 
 public class DeclineConnectionPacket extends Packet {
-    private int connectionNumber;
+    private String ip;
+    private int port;
     
-    public DeclineConnectionPacket(int connectionName) {
+    public DeclineConnectionPacket(String ip, int port) {
         super();
-        this.connectionNumber = connectionName;
+        this.ip = ip;
+        this.port = port;
     }
     
-    public int getConnectionNumber() {
-        return connectionNumber;
+    public String getip() {
+        return ip;
+    }
+    
+    public int getPort() {
+        return port;
     }
 }

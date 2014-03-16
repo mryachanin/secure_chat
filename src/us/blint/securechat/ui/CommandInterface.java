@@ -51,7 +51,9 @@ public class CommandInterface implements ChatInterface {
             inputArray = new LinkedList<String>(Arrays.asList(in.readLine().toLowerCase().split("\\s+")));
             switch(inputArray.pop()) {
                 case "/accept":
-                    return new AcceptConnectionPacket(Integer.parseInt(inputArray.pop()));
+                    return new AcceptConnectionPacket(inputArray.pop(), 
+                                Integer.parseInt(inputArray.pop()), 
+                                inputArray.pop());
         
                 case "/connect":
                     try {
@@ -65,7 +67,8 @@ public class CommandInterface implements ChatInterface {
                     break;
         
                 case "/decline":
-                    return new DeclineConnectionPacket(Integer.parseInt(inputArray.pop()));
+                    return new DeclineConnectionPacket(inputArray.pop(),
+                                Integer.parseInt(inputArray.pop()));
         
                 case "/disconnect":
                     return new DisconnectPacket(inputArray.pop());

@@ -26,7 +26,6 @@ public class Connection extends Thread {
     private BufferedReader in;
     private PrintWriter out;
     private String connectionName;
-    private int connectionNumber;
     private ConnectionManager cm;
     private ChatInterface ui;
     private boolean finished;
@@ -40,10 +39,9 @@ public class Connection extends Thread {
      *  @param connectionNumber     Unique number of this connection
      *  @param connectionManager    Manages all connections
      */
-    public Connection(Socket s, String connectionName, int connectionNumber, ConnectionManager cm) {
+    public Connection(Socket s, String connectionName, ConnectionManager cm) {
         this.s = s;
         this.connectionName = connectionName;
-        this.connectionNumber = connectionNumber;
         finished = false;
         
         this.cm = cm;
@@ -57,7 +55,7 @@ public class Connection extends Thread {
     }
     
     public void run() {
-        boolean allowed = cm.requestConnection(connectionName, connectionNumber);
+        boolean allowed = cm.requestConnection(s.getInetAddress().getHostName(), s.getPort());
         if(!allowed) {
             ui.send(new DisplayConnectionDeclinedPacket(connectionName));
             try {
@@ -94,12 +92,12 @@ public class Connection extends Thread {
     }
     
     /**
-     *  Returns the unique id of this connection
+     *  Sets the name of this connection
      *  
-     *  @return Unique id of this connection
+     *  @param connectionName New name of this connection
      */
-    public int getConnectionNumber() {
-        return connectionNumber;
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
     }
     
     /**

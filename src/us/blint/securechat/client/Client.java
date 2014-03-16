@@ -53,7 +53,7 @@ public class Client extends Thread {
         Packet command;
         while((command = ui.getInput()) != null) {
             if(command instanceof AcceptConnectionPacket) {
-                cm.acceptConnection(((AcceptConnectionPacket)command).getConnectionNumber());
+                cm.acceptConnection(((AcceptConnectionPacket)command).getip(), ((AcceptConnectionPacket)command).getPort(), ((AcceptConnectionPacket)command).getConnectionName());
                 break;
             }
             
@@ -63,7 +63,7 @@ public class Client extends Thread {
             }
             
             else if(command instanceof DeclineConnectionPacket) {
-                cm.declineConnection(((DeclineConnectionPacket)command).getConnectionNumber());
+                cm.declineConnection(((DeclineConnectionPacket)command).getip(), ((DeclineConnectionPacket)command).getPort());
                 break;
             }
             
