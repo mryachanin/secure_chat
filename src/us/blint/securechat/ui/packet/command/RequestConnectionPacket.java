@@ -5,6 +5,7 @@ import us.blint.securechat.ui.packet.Packet;
 public class RequestConnectionPacket extends Packet {
     private String ip, connectionName;
     private int port;
+    
     public RequestConnectionPacket(String ip, int port, String connectionName) {
         super();
         this.ip = ip;

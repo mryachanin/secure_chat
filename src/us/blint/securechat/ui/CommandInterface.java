@@ -1,4 +1,5 @@
 package us.blint.securechat.ui;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,22 +8,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import us.blint.securechat.connection.Connection;
-import us.blint.securechat.connection.ConnectionRequest;
 import us.blint.securechat.ui.packet.Packet;
 import us.blint.securechat.ui.packet.command.AcceptConnectionPacket;
 import us.blint.securechat.ui.packet.command.DeclineConnectionPacket;
 import us.blint.securechat.ui.packet.command.DisconnectPacket;
-import us.blint.securechat.ui.packet.command.PrintConnectionsPacket;
-import us.blint.securechat.ui.packet.command.PrintPendingConnectionsPacket;
 import us.blint.securechat.ui.packet.command.RequestConnectionPacket;
 import us.blint.securechat.ui.packet.command.SendMessagePacket;
-import us.blint.securechat.ui.packet.display.DisplayAcceptedConnectionsPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
 import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
-import us.blint.securechat.ui.packet.display.DisplayPendingConnectionsPacket;
 import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
 import us.blint.securechat.ui.packet.error.ConnectErrorPacket;
 import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
@@ -34,8 +29,10 @@ import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
  */
 public class CommandInterface implements ChatInterface {
     
-    BufferedReader in;
-    PrintWriter out;
+    private BufferedReader in;
+    private PrintWriter out;
+    private ArrayList<String> pendingConnections;
+    private ArrayList<String> acceptedConnections;
     
     /**
      *  Initializes the default input and output stream (system.in / system.out)
@@ -43,6 +40,8 @@ public class CommandInterface implements ChatInterface {
     public CommandInterface() {
         in = new BufferedReader(new InputStreamReader(System.in));
         out = new PrintWriter(System.out, true);
+        pendingConnections = new ArrayList<String>();
+        acceptedConnections = new ArrayList<String>();
     }
     
     @Override
@@ -52,7 +51,7 @@ public class CommandInterface implements ChatInterface {
             inputArray = new LinkedList<String>(Arrays.asList(in.readLine().toLowerCase().split("\\s+")));
             switch(inputArray.pop()) {
                 case "/accept":
-                    return new AcceptConnectionPacket(inputArray.pop());
+                    return new AcceptConnectionPacket(Integer.parseInt(inputArray.pop()));
         
                 case "/connect":
                     try {
@@ -66,13 +65,16 @@ public class CommandInterface implements ChatInterface {
                     break;
         
                 case "/decline":
-                    return new DeclineConnectionPacket(inputArray.pop());
+                    return new DeclineConnectionPacket(Integer.parseInt(inputArray.pop()));
         
                 case "/disconnect":
                     return new DisconnectPacket(inputArray.pop());
         
                 case "/list":
-                    return new PrintConnectionsPacket();
+                    out.println("#### Connected To ####");
+                    for(String con: acceptedConnections) {
+                        out.println(con);
+                    }
            
                 case "/msg":
                     String connectionName = inputArray.pop();
@@ -84,7 +86,10 @@ public class CommandInterface implements ChatInterface {
                     }
                 
                 case "/pending":
-                    return new PrintPendingConnectionsPacket();
+                    out.println("#### Pending Connections ####");
+                    for(String con: pendingConnections) {
+                        out.println(con);
+                    }
                     
                 case "/quit":
                     System.exit(0);
@@ -112,31 +117,7 @@ public class CommandInterface implements ChatInterface {
     	if(p instanceof DisplayMessagePacket) {
     		out.println("#### Incomming request from " + ((DisplayMessagePacket)p).getConnectionName() + " ####");
     		out.println(((DisplayMessagePacket)p).getMessage());
-    	}
-    	
-    	else if(p instanceof DisplayAcceptedConnectionsPacket) {
-        	out.println("#### Connected To ####");
-            ArrayList<Connection> connections = ((DisplayAcceptedConnectionsPacket)p).getAcceptedConnections();
-            synchronized(connections) {
-                for(Connection con: connections) {
-                    if(con.isClosed())
-                        connections.remove(con);
-                    else
-                        out.println(con.getName());
-                }
-            }
-        }
-        
-    	else if(p instanceof DisplayPendingConnectionsPacket) {
-        	out.println("#### Pending Connections ####");
-            ArrayList<ConnectionRequest> pendingConnections = ((DisplayPendingConnectionsPacket)p).getPendingConnections();
-            synchronized(pendingConnections) {
-                for(ConnectionRequest cr: pendingConnections) {
-                    out.println(cr.getConnectionName());
-                }
-            }
-        }
-        
+    	}    
         
     	else if(p instanceof DisplayConnectionAcceptedPacket) {
         	out.println("#### You are now connected to " + ((DisplayConnectionAcceptedPacket)p).getConnectionName() + " ####");

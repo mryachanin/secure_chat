@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import us.blint.securechat.client.Client;
 import us.blint.securechat.ui.ChatInterface;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
@@ -21,27 +22,34 @@ import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
  *      If the user does not accept the connection, the socket is closed. 
  */
 public class Connection extends Thread {
+    private String id;
     private Socket s;
     private BufferedReader in;
     private PrintWriter out;
     private String connectionName;
+    private int connectionNumber;
     private ConnectionManager cm;
     private ChatInterface ui;
+    private boolean finished;
     
     /**
      *  Initializes variables
      *  Starts main thread
      * 
-     *  @param s      Socket between the client and another user
-     *  @param name   Name of this connection
-     *  @param sysout Output stream to user
-     *  @param ui     Defines the user interface
+     *  @param s    Socket between the client and another user
+     *  @param connectionName       Name of this connection
+     *  @param connectionNumber     Unique number of this connection
+     *  @param connectionManager    Manages all connections
      */
-    public Connection(Socket s, String connectionName, ConnectionManager cm, ChatInterface ui) {
+    public Connection(Socket s, String connectionName, int connectionNumber, ConnectionManager cm) {
+        this.id = new String(id);
         this.s = s;
         this.connectionName = connectionName;
+        this.connectionNumber = connectionNumber;
+        finished = false;
+        
         this.cm = cm;
-        this.ui = ui;
+        this.ui = Client.getChatInterface();
         try {
             this.in = new BufferedReader(
                           new InputStreamReader(s.getInputStream()));
@@ -51,7 +59,7 @@ public class Connection extends Thread {
     }
     
     public void run() {
-        boolean allowed = cm.requestConnection(connectionName);
+        boolean allowed = cm.requestConnection(connectionName, connectionNumber);
         if(!allowed) {
             ui.send(new DisplayConnectionDeclinedPacket(connectionName));
             try {
@@ -61,7 +69,7 @@ public class Connection extends Thread {
             ui.send(new DisplayConnectionAcceptedPacket(connectionName));
             try {
                 String line;
-                while((line = in.readLine()) != null) {
+                while((line = in.readLine()) != null && !finished) {
                     ui.send(new DisplayMessagePacket(line, connectionName));
                 }
                 s.close();
@@ -85,6 +93,25 @@ public class Connection extends Thread {
      */
     public String getConnectionName() {
         return connectionName;
+    }
+    
+    /**
+     *  Returns the unique id of this connection
+     *  
+     *  @return Unique id of this connection
+     */
+    public int getConnectionNumber() {
+        return connectionNumber;
+    }
+    
+    /**
+     *  Sets finished to true. This will exit the while loop in run() and 
+     *  close the socket.
+     *  
+     *  @throws IOException
+     */
+    public void close() throws IOException {
+        finished = true;
     }
     
     /**

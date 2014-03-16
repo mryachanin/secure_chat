@@ -7,8 +7,6 @@ import us.blint.securechat.ui.packet.Packet;
 import us.blint.securechat.ui.packet.command.AcceptConnectionPacket;
 import us.blint.securechat.ui.packet.command.DeclineConnectionPacket;
 import us.blint.securechat.ui.packet.command.DisconnectPacket;
-import us.blint.securechat.ui.packet.command.PrintConnectionsPacket;
-import us.blint.securechat.ui.packet.command.PrintPendingConnectionsPacket;
 import us.blint.securechat.ui.packet.command.RequestConnectionPacket;
 import us.blint.securechat.ui.packet.command.SendMessagePacket;
 import us.blint.securechat.server.Server;
@@ -55,7 +53,7 @@ public class Client extends Thread {
         Packet command;
         while((command = ui.getInput()) != null) {
             if(command instanceof AcceptConnectionPacket) {
-                cm.acceptConnection(((AcceptConnectionPacket)command).getConnectionName());
+                cm.acceptConnection(((AcceptConnectionPacket)command).getConnectionNumber());
                 break;
             }
             
@@ -65,27 +63,17 @@ public class Client extends Thread {
             }
             
             else if(command instanceof DeclineConnectionPacket) {
-                cm.declineConnection(((DeclineConnectionPacket)command).getConnectionName());
+                cm.declineConnection(((DeclineConnectionPacket)command).getConnectionNumber());
                 break;
             }
             
             else if(command instanceof DisconnectPacket) {
-                cm.acceptConnection(((DisconnectPacket)command).getConnectionName());
-                break;
-            }
-            
-            else if(command instanceof PrintConnectionsPacket) {
-                cm.printAcceptedConnections();
+                cm.disconnect(((DisconnectPacket)command).getConnectionName());
                 break;
             }
             
             else if(command instanceof SendMessagePacket) {
                 cm.sendMessage(((SendMessagePacket)command).getConnectionName(), ((SendMessagePacket)command).getMessage());
-                break;
-            }
-            
-            else if(command instanceof PrintPendingConnectionsPacket) {
-                cm.printPendingConnections();
                 break;
             }
         }

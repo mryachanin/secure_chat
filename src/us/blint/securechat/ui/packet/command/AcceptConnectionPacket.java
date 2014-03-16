@@ -3,14 +3,14 @@ package us.blint.securechat.ui.packet.command;
 import us.blint.securechat.ui.packet.Packet;
 
 public class AcceptConnectionPacket extends Packet {
-    private String connectionName;
+    private int connectionNumber;
     
-    public AcceptConnectionPacket(String connectionName) {
+    public AcceptConnectionPacket(int connectionName) {
         super();
-        this.connectionName = connectionName;
+        this.connectionNumber = connectionName;
     }
     
-    public String getConnectionName() {
-        return connectionName;
+    public int getConnectionNumber() {
+        return connectionNumber;
     }
 }

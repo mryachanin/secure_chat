@@ -1,18 +1,21 @@
 package us.blint.securechat.connection;
 /**
- *  Stores the name of a pending request and the state of that request.
+ *  Stores the name, number, and state of a pending request.
  */
 public class ConnectionRequest {
     private String connectionName;
+    private int connectionNumber;
     private boolean accept;
     
     /**
      *  Initializes connection name to value passed in
      * 
-     *  @param connectionName Name of the connection associated with this request.
+     *  @param connectionName   Name of the connection associated with this request.
+     *  @param connectionNumber Unique number of the connection this request is associated with
      */
-    public ConnectionRequest(String connectionName) {
+    public ConnectionRequest(String connectionName, int connectionNumber) {
         this.connectionName = connectionName;
+        this.connectionNumber = connectionNumber;
     }
     
     /**
@@ -39,6 +42,15 @@ public class ConnectionRequest {
      *  @return Name of the connection this request is associated with
      */
     public String getConnectionName() {
-        return this.connectionName;
+        return connectionName;
+    }
+    
+    /**
+     *  Returns the unique number of the connection this request is associated with
+     *  
+     *  @return Unique number of the connection this request is associated with
+     */
+    public int getConnectionNumber() {
+        return connectionNumber;
     }
 }
