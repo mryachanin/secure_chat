@@ -54,27 +54,22 @@ public class Client extends Thread {
         while((command = ui.getInput()) != null) {
             if(command instanceof AcceptConnectionPacket) {
                 cm.acceptConnection(((AcceptConnectionPacket)command).getip(), ((AcceptConnectionPacket)command).getPort(), ((AcceptConnectionPacket)command).getConnectionName());
-                break;
             }
             
             else if(command instanceof RequestConnectionPacket) {
                 cm.connect(((RequestConnectionPacket)command).getip(), ((RequestConnectionPacket)command).getPort(), ((RequestConnectionPacket)command).getConnectionName());
-                break;
             }
             
             else if(command instanceof DeclineConnectionPacket) {
                 cm.declineConnection(((DeclineConnectionPacket)command).getip(), ((DeclineConnectionPacket)command).getPort());
-                break;
             }
             
             else if(command instanceof DisconnectPacket) {
                 cm.disconnect(((DisconnectPacket)command).getConnectionName());
-                break;
             }
             
             else if(command instanceof SendMessagePacket) {
                 cm.sendMessage(((SendMessagePacket)command).getConnectionName(), ((SendMessagePacket)command).getMessage());
-                break;
             }
         }
     }

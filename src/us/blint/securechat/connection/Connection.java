@@ -36,7 +36,6 @@ public class Connection extends Thread {
      * 
      *  @param s    Socket between the client and another user
      *  @param connectionName       Name of this connection
-     *  @param connectionNumber     Unique number of this connection
      *  @param connectionManager    Manages all connections
      */
     public Connection(Socket s, String connectionName, ConnectionManager cm) {
@@ -57,7 +56,7 @@ public class Connection extends Thread {
     public void run() {
         boolean allowed = cm.requestConnection(s.getInetAddress().getHostName(), s.getPort());
         if(!allowed) {
-            ui.send(new DisplayConnectionDeclinedPacket(connectionName));
+            ui.send(new DisplayConnectionDeclinedPacket(connectionName, s.getPort()));
             try {
                 s.close();
             } catch (IOException e) { e.printStackTrace(); }
@@ -79,6 +78,7 @@ public class Connection extends Thread {
      *  @param message String to send over the socket
      */
     public void sendMessage(String message) {
+        System.out.println("Message Sent!");
         out.println(message);
     }
     

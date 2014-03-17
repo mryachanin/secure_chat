@@ -42,7 +42,8 @@ public class ConnectionManager {
      *  Request the user to accept a connection. This method should block the
      *  calling thread until the user either confirms or denies the request.
      *
-     *  @param connectionName The identifier for the connection
+     *  @param connectionName ip of the requested connection
+     *  @param port Port of the requested connection
      *
      *  @return true is the user accepts the connection, false otherwise
      */
@@ -64,7 +65,9 @@ public class ConnectionManager {
      *  Allows messages to be received through the socket associated with this
      *  Connection id
      * 
-     *  @param connectionName Name of the connection to accept
+     *  @param ip Internet Protocol Address of the connection to accept
+     *  @param port Port of the connection to accept
+     *  @param connectionName Name of the connection that will be accepted
      */
     public void acceptConnection(String ip, int port, String connectionName) {
         synchronized(pendingConnections) {
@@ -79,7 +82,9 @@ public class ConnectionManager {
                 }
             }
         }
-        connectionMap.get(ip).setConnectionName(connectionName);
+        if(connectionMap.get(ip) != null) {
+            connectionMap.get(ip).setConnectionName(connectionName);
+        }
     }
     
     /**
@@ -87,6 +92,7 @@ public class ConnectionManager {
      *  with this Connection id
      * 
      *  @param connectionName Name of the connection to decline
+     *  @param port Port of the connection to decline
      */
     public void declineConnection(String ip, int port) {
         synchronized(pendingConnections) {
@@ -114,7 +120,7 @@ public class ConnectionManager {
         try {
             connect(new Socket(ip, port), connectionName);
         } catch (ConnectException e) {
-            ui.send(new ConnectionRefusedErrorPacket(e, connectionName));
+            ui.send(new ConnectionRefusedErrorPacket(e, connectionName, port));
         } catch(IOException e) {
             ui.send(new ConnectErrorPacket(e));
         }
@@ -147,9 +153,10 @@ public class ConnectionManager {
     }
     
     /**
-     *  Continuously sends messages to a connection until user types '/close'
+     *  Sends a message to a connection
      * 
      *  @param connectionName Name of the connection to send messages
+     *  @param message Message to send to a connection
      */
     public void sendMessage(String connectionName, String message) {
         connectionMap.get(connectionName).sendMessage(message);

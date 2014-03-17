@@ -7,7 +7,6 @@ public class DeclineConnectionPacket extends Packet {
     private int port;
     
     public DeclineConnectionPacket(String ip, int port) {
-        super();
         this.ip = ip;
         this.port = port;
     }

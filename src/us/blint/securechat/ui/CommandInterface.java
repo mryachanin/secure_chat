@@ -47,67 +47,88 @@ public class CommandInterface implements ChatInterface {
     @Override
     public Packet getInput() {
         LinkedList<String> inputArray;
+        String ip, port, connectionName;
         try {
             inputArray = new LinkedList<String>(Arrays.asList(in.readLine().toLowerCase().split("\\s+")));
             switch(inputArray.pop()) {
                 case "/accept":
-                    return new AcceptConnectionPacket(inputArray.pop(), 
-                                Integer.parseInt(inputArray.pop()), 
-                                inputArray.pop());
+                    ip = inputArray.pop();
+                    port = inputArray.pop();               
+                    connectionName = inputArray.pop();
+                    
+                    acceptedConnections.add(connectionName + ":" + port);
+                    pendingConnections.remove(ip + ":" + port);
+                    
+                    try {
+                        return new AcceptConnectionPacket(ip, Integer.parseInt(port), connectionName);
+                    } catch(NumberFormatException e) {
+                        out.println("Usage: accept <ip> <port> <nickname>");
+                        return new Packet();
+                    }
         
                 case "/connect":
+                    ip = inputArray.pop();
+                    port = inputArray.pop();
+                    connectionName = inputArray.pop();
+                    
+                    pendingConnections.add(connectionName + ":" + port);
+                    
                     try {
-                        return new RequestConnectionPacket(inputArray.pop(), 
-                                    Integer.parseInt(inputArray.pop()), 
-                                    inputArray.pop());
-                        
+                        return new RequestConnectionPacket(ip, Integer.parseInt(port), connectionName);
                     } catch(NumberFormatException e) {
-                        out.println("Usage: connect <ip> <port> <name>");
+                        out.println("Usage: connect <ip> <port> <nickname>");
+                        return new Packet();
                     }
-                    break;
         
                 case "/decline":
-                    return new DeclineConnectionPacket(inputArray.pop(),
-                                Integer.parseInt(inputArray.pop()));
+                    ip = inputArray.pop();
+                    port = inputArray.pop();                 
+                    
+                    pendingConnections.remove(ip + ":" + port);
+                    
+                    try {
+                        return new DeclineConnectionPacket(ip, Integer.parseInt(port));
+                    } catch(NumberFormatException e) {
+                        out.println("Usage: decline <ip> <port>");
+                        return new Packet();
+                    }
         
                 case "/disconnect":
-                    return new DisconnectPacket(inputArray.pop());
+                    connectionName = inputArray.pop();
+                    return new DisconnectPacket(connectionName);
         
                 case "/list":
                     out.println("#### Connected To ####");
                     for(String con: acceptedConnections) {
                         out.println(con);
                     }
+                    break;
            
                 case "/msg":
-                    String connectionName = inputArray.pop();
-                    while(true) {
-                        String msg = in.readLine();
-                        if(msg.equals("/close"))
-                            break;
-                        return new SendMessagePacket(connectionName, msg);
-                    }
+                    connectionName = inputArray.pop();
+                    String message = in.readLine();
+                    return new SendMessagePacket(connectionName, message);
                 
                 case "/pending":
                     out.println("#### Pending Connections ####");
                     for(String con: pendingConnections) {
                         out.println(con);
                     }
+                    break;
                     
                 case "/quit":
                     System.exit(0);
                     
                 default:
                     out.println("Valid commands:");
-                    out.println("\t/accept <ip>");
+                    out.println("\t/accept <ip> <port> <nickname>");
                     out.println("\t/connect <ip> <port> <nickname>");
-                    out.println("\t/decline <ip>");
-                    out.println("\t/disconnect <ip/nickname>");
+                    out.println("\t/decline <ip> <port>");
+                    out.println("\t/disconnect <nickname>");
                     out.println("\t/list");
-                    out.println("\t/msg <ip/nickname>");
+                    out.println("\t/msg <nickname>");
                     out.println("\t/pending");
                     out.println("\t/quit");
-                    return new Packet();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -117,30 +138,42 @@ public class CommandInterface implements ChatInterface {
 
     @Override
     public void send(Packet p) {
+        String ip, connectionName;
+        int port;
     	if(p instanceof DisplayMessagePacket) {
-    		out.println("#### Incomming request from " + ((DisplayMessagePacket)p).getConnectionName() + " ####");
+    	    connectionName = ((DisplayMessagePacket)p).getConnectionName();
+    		out.println("#### Incomming from " + connectionName + " ####");
     		out.println(((DisplayMessagePacket)p).getMessage());
     	}    
         
     	else if(p instanceof DisplayConnectionAcceptedPacket) {
-        	out.println("#### You are now connected to " + ((DisplayConnectionAcceptedPacket)p).getConnectionName() + " ####");
+    	    connectionName = ((DisplayConnectionAcceptedPacket)p).getConnectionName();
+        	out.println("#### You are now connected to " + connectionName + " ####");
         }
         
     	else if(p instanceof DisplayConnectionDeclinedPacket) {
-        	out.println("#### Declined connection from " + ((DisplayConnectionDeclinedPacket)p).getConnectionName() + " ####");
+    	    ip = ((DisplayConnectionDeclinedPacket)p).getip();
+    	    port = ((DisplayConnectionDeclinedPacket)p).getPort();
+        	out.println("#### Declined connection from " + ip + ":" + port + " ####");
         }
     	
     	else if(p instanceof DisplayServerStartPacket) {
-    		out.println("#### Server started on port: " + ((DisplayServerStartPacket)p).getPort() + " ####");
+    	    port = ((DisplayServerStartPacket)p).getPort();
+    		out.println("#### Server started on port: " + port + " ####");
     	}
     	
     	else if(p instanceof DisplayConnectionRequestPacket) {
-    		out.println("#### Incoming Request From " + ((DisplayConnectionRequestPacket)p).getConnectionName() + " ####");
+    	    ip = ((DisplayConnectionRequestPacket)p).getip();
+    	    port = ((DisplayConnectionRequestPacket)p).getPort();
+    		out.println("#### Incoming Request From " + ip + ":" + port + " ####");
     	}
         
     	else if(p instanceof ConnectionRefusedErrorPacket) {
-        	out.println("#### "+ ((ConnectionRefusedErrorPacket)p).getConnectionName() + " declined your connection request ####");
-        }
+        	connectionName = ((ConnectionRefusedErrorPacket)p).getConnectionName();
+        	port = ((ConnectionRefusedErrorPacket)p).getPort();
+    	    out.println("#### "+ connectionName + ":" + port + " declined your connection request ####");
+        	pendingConnections.remove(connectionName + ":" + port);
+    	}
         
     	else if(p instanceof ConnectErrorPacket) {
         	out.println("Usage: /connect <ip> <port> <name>");
@@ -149,8 +182,5 @@ public class CommandInterface implements ChatInterface {
     	else if(p instanceof DisconnectErrorPacket) {
         	out.println("Usage: /disconnect <ip/nickname>");
         }
-        
-    	else 
-    		out.println(p);
     }
 }

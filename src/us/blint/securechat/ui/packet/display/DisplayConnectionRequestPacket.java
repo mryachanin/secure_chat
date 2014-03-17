@@ -3,13 +3,19 @@ package us.blint.securechat.ui.packet.display;
 import us.blint.securechat.ui.packet.Packet;
 
 public class DisplayConnectionRequestPacket extends Packet {
-	String connectionName;
+	private String ip;
+	private int port;
 	
-	public DisplayConnectionRequestPacket(String connectionName) {
-		this.connectionName = connectionName;
+	public DisplayConnectionRequestPacket(String ip, int port) {
+		this.ip = ip;
+		this.port = port;
 	}
 	
-	public String getConnectionName() {
-		return connectionName;
+	public String getip() {
+		return ip;
+	}
+	
+	public int getPort() {
+	    return port;
 	}
 }

@@ -7,7 +7,6 @@ public class AcceptConnectionPacket extends Packet {
     private int port;
     
     public AcceptConnectionPacket(String ip, int port, String connectionName) {
-        super();
         this.ip = ip;
         this.port = port;
         this.connectionName = connectionName;

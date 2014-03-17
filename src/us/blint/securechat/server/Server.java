@@ -43,8 +43,8 @@ public class Server extends Thread {
         Socket clientSocket;
         try {
             clientSocket = serverSocket.accept();
-            String ip = clientSocket.getInetAddress().toString();
-            ui.send(new DisplayConnectionRequestPacket(ip));
+            String ip = clientSocket.getInetAddress().getHostName();
+            ui.send(new DisplayConnectionRequestPacket(ip, clientSocket.getPort()));
             cm.connect(clientSocket, ip);
         } catch (IOException e) { e.printStackTrace(); }
     }

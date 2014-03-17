@@ -6,7 +6,6 @@ public class DisconnectPacket extends Packet {
     private String connectionName;
     
     public DisconnectPacket(String connectionName) {
-        super();
         this.connectionName = connectionName;
     }
     
