@@ -12,9 +12,11 @@ import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
 import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
 
 /**
+ *  <pre>
  *  Provides an interface between the user and Connection objects
  *  
  *  This is a singleton class. Only 1 instance of it will ever be in existence.
+ *  </pre>
  */
 public class ConnectionManager {
     

@@ -12,12 +12,14 @@ import us.blint.securechat.ui.packet.command.SendMessagePacket;
 import us.blint.securechat.server.Server;
 
 /**
+ *  <pre>
  *  Defines a client that can accept connections, request connections,
  *      and send data securely over connections to other clients. 
  *      
  *  When this thread starts, it will:
  *      Continuously probe for command packets from the user interface and deal
  *      with them accordingly
+ *  </pre>
  */
 public class Client extends Thread {
 
@@ -26,9 +28,11 @@ public class Client extends Thread {
     private Server server;
     
     /**
-     *  Initialize variables
-     *  Starts server thread
-     *  Starts main thread
+     *  <ul>
+     *  <li>Initialize variables</li>
+     *  <li>Starts server thread</li>
+     *  <li>Starts main thread</li>
+     *  <ul>
      *  
      *  @param ui   String representation of the user interface class to use
      */

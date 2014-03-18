@@ -1,4 +1,5 @@
 package us.blint.securechat.connection;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,9 +12,10 @@ import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
 import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 
 /**
+ *  <pre>
  *  Defines a connection
  *
- *  When this thread starts, it will prompt the user to accept the connection 
+ *  When this thread starts, it will prompt the user to accept the connection
  *  if the user did not initiate it.
  *      Case: User initiates request
  *          The thread will continuously probe for input from the socket 
@@ -27,7 +29,8 @@ import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
  *              input from the socket associated with this connection and print
  *              the input to the user. When the BufferedReader returns null, 
  *              the socket is closed.
- *          If the user does not accept the connection, the socket is closed. 
+ *          If the user does not accept the connection, the socket is closed.
+ *  </pre>
  */
 public class Connection extends Thread {
     private Socket s;

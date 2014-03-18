@@ -11,6 +11,7 @@ import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
 import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
 
 /**
+ *  <pre>
  *  Defines a server that will constantly listen for connection requests
  *
  *  When started as a thread, this will:
@@ -20,6 +21,7 @@ import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
  *          that a connection is pending.
  *          All validation is handled in the Connection object so multiple 
  *          requests can be pending at once.
+ *  </pre>
  */
 public class Server extends Thread {
     private ServerSocket serverSocket;
