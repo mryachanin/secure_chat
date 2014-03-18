@@ -31,9 +31,9 @@ public class Server extends Thread {
      *  Instantiates a new server socket
      *  Sends user interface a packet with the port this server started on
      */
-    public Server() {
+    public Server(ChatInterface ui) {
         cm = ConnectionManager.getInstance();
-        ui = Client.getChatInterface();
+        this.ui = ui;
         try {
             serverSocket = new ServerSocket(serverPort);
             ui.send(new DisplayServerStartPacket(serverSocket.getLocalPort()));

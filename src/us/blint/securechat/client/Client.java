@@ -36,7 +36,7 @@ public class Client extends Thread {
         ui= new CommandInterface();
         cm = ConnectionManager.getInstance();
         cm.setUI(ui);
-        server = new Server();
+        server = new Server(ui);
         server.start();
         start();
     }
