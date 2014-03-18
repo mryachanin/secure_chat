@@ -8,7 +8,7 @@ public class ConnectionRequest {
     private boolean accept;
     
     /**
-     *  Initializes connection ip and port to values passed in
+     *  Initialize variables
      * 
      *  @param ip     ip of the connection associated with this request.
      *  @param port   Port of the connection associated with this request

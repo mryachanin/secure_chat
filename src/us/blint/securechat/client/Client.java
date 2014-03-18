@@ -33,7 +33,7 @@ public class Client extends Thread {
     private Server server;
 
     /**
-     *  Initializes variables
+     *  Initialize variables
      *  Starts server thread
      *  Starts main thread
      *  

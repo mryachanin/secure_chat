@@ -17,15 +17,17 @@ import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
  *  When this thread starts, it will prompt the user to accept the connection 
  *  if the user did not initiate it.
  *      Case: User initiates request
- *          the thread will continuously probe for input from the socket 
- *          associated with this connection and print the input to the user. 
+ *          The thread will continuously probe for input from the socket 
+ *              associated with this connection and print the input to the user. 
  *          When the BufferedReader returns null, the socket is closed.
  *      
  *      Case: Other user initiates request:
+ *          Request the user to accept a connection. The thread will be blocked
+ *              until the user either confirms or denies the request.
  *          If the connection is accepted, the thread will continuously probe for 
- *          input from the socket associated with this connection and print the 
- *          input to the user. When the BufferedReader returns null, the socket is 
- *          closed.
+ *              input from the socket associated with this connection and print
+ *              the input to the user. When the BufferedReader returns null, 
+ *              the socket is closed.
  *          If the user does not accept the connection, the socket is closed. 
  */
 public class Connection extends Thread {
@@ -38,7 +40,7 @@ public class Connection extends Thread {
     private boolean accepted, finished;
     
     /**
-     *  Initializes variables
+     *  Initialize variables
      *  Starts main thread
      * 
      *  @param s                   Socket between the client and another user

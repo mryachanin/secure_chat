@@ -16,6 +16,7 @@ import us.blint.securechat.ui.packet.command.RequestConnectionPacket;
 import us.blint.securechat.ui.packet.command.SendMessagePacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
+import us.blint.securechat.ui.packet.display.DisplayConnectionNameExistsPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
 import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
@@ -35,7 +36,7 @@ public class CommandInterface implements ChatInterface {
     private ArrayList<String> acceptedConnections;
     
     /**
-     *  Initializes the default input and output stream (system.in / system.out)
+     *  Initialize variables
      */
     public CommandInterface() {
         in = new BufferedReader(new InputStreamReader(System.in));
@@ -54,9 +55,14 @@ public class CommandInterface implements ChatInterface {
                 case "/accept":
                     ip = inputArray.pop();
                     port = inputArray.pop();               
-                    connectionName = inputArray.pop();
+                    if(inputArray.size() > 0) {
+                        connectionName = inputArray.pop();
+                        acceptedConnections.add(connectionName + ":" + port);
+                    } else {
+                        connectionName = null;
+                        acceptedConnections.add(ip + ":" + port);
+                    }
                     
-                    acceptedConnections.add(connectionName + ":" + port);
                     pendingConnections.remove(ip + ":" + port);
                     
                     try {
@@ -168,6 +174,10 @@ public class CommandInterface implements ChatInterface {
     		out.println("#### Incoming Request From " + ip + ":" + port + " ####");
     	}
         
+    	else if(p instanceof DisplayConnectionNameExistsPacket) {
+    	    connectionName = ((DisplayConnectionNameExistsPacket)p).getConnectionName();
+    	    out.println("#### The connection name: " + connectionName + " is already assigned ####");
+    	}
     	else if(p instanceof ConnectionRefusedErrorPacket) {
         	connectionName = ((ConnectionRefusedErrorPacket)p).getIP();
         	port = ((ConnectionRefusedErrorPacket)p).getPort();

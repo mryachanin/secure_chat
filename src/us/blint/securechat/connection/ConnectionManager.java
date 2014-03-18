@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import us.blint.securechat.client.Client;
 import us.blint.securechat.ui.ChatInterface;
+import us.blint.securechat.ui.packet.display.DisplayConnectionNameExistsPacket;
 import us.blint.securechat.ui.packet.error.ConnectIOErrorPacket;
 import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
 import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
@@ -69,6 +70,11 @@ public class ConnectionManager {
      *  @param connectionName   Name of the connection that will be accepted
      */
     public void acceptConnection(String ip, int port, String connectionName) {
+        if(connectionName != null && connectionMap.containsKey(connectionName)) {
+            ui.send(new DisplayConnectionNameExistsPacket(connectionName));
+            return;
+        }
+        
         synchronized(pendingConnectionRequests) {
             for(ConnectionRequest cr: pendingConnectionRequests) {
                 if(cr.getip().equals(ip) && cr.getPort() == port) {
