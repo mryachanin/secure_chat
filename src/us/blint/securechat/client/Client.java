@@ -20,18 +20,11 @@ import us.blint.securechat.server.Server;
  *      with them accordingly
  */
 public class Client extends Thread {
-    
-    private static ChatInterface ui;
-    //private static void setChatInteface(ChatInterface ui) {
-    //    Client.ui = ui;
-    //}
-    public static ChatInterface getChatInterface() {
-        return Client.ui;
-    }
-    
+
+    private ChatInterface ui;
     private ConnectionManager cm;
     private Server server;
-
+    
     /**
      *  Initialize variables
      *  Starts server thread
@@ -40,10 +33,9 @@ public class Client extends Thread {
      *  @param ui   String representation of the user interface class to use
      */
     public Client(String uiClassName) {
-        this.cm = ConnectionManager.getInstance();
-        //Class<?> chatInterface = Class.forName(uiClassName);
-        //Object ui = chatInterface.newInstance();
         ui= new CommandInterface();
+        cm = ConnectionManager.getInstance();
+        cm.setUI(ui);
         server = new Server();
         server.start();
         start();

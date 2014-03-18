@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import us.blint.securechat.client.Client;
 import us.blint.securechat.ui.ChatInterface;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
@@ -48,14 +47,14 @@ public class Connection extends Thread {
      *  @param connectionManager   Manages all connections
      *  @param accepted            True if the user initiated the connection
      */
-    public Connection(Socket s, String connectionName, ConnectionManager cm, boolean accepted) {
+    public Connection(Socket s, String connectionName, ConnectionManager cm, ChatInterface ui, boolean accepted) {
         this.s = s;
         this.connectionName = connectionName;
         this.accepted = accepted;
         finished = false;
         
         this.cm = cm;
-        this.ui = Client.getChatInterface();
+        this.ui = ui;
         try {
             this.in = new BufferedReader(
                           new InputStreamReader(s.getInputStream()));

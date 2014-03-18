@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import us.blint.securechat.ui.packet.Packet;
@@ -34,6 +35,7 @@ public class CommandInterface implements ChatInterface {
     private PrintWriter out;
     private ArrayList<String> pendingConnections;
     private ArrayList<String> acceptedConnections;
+    private HashMap<String, ConnectionInfo> connectionMap;
     
     /**
      *  Initialize variables
@@ -43,6 +45,55 @@ public class CommandInterface implements ChatInterface {
         out = new PrintWriter(System.out, true);
         pendingConnections = new ArrayList<String>();
         acceptedConnections = new ArrayList<String>();
+        connectionMap = new HashMap<String, ConnectionInfo>();
+    }
+    
+    /**
+     *  Stores information about a connection for displaying to the user
+     */
+    private class ConnectionInfo {
+        private int id, port;
+        private String ip;
+        
+        /**
+         *  Initialize variables
+         * 
+         *  @param id     ID of a Connection
+         *  @param ip     IP of a Connection
+         *  @param port   Port of a Connection
+         */
+        public ConnectionInfo(int id, String ip, int port) {
+            this.id = id;
+            this.port = port;
+            this.ip = ip;
+        }
+        
+        /**
+         *  Returns the ID of the Connection this is related to
+         *  
+         *  @return id
+         */
+        public int getID() {
+            return id;
+        }
+        
+        /**
+         *  Returns the IP of the Connection this is related to
+         * 
+         *  @return ip
+         */
+        public String getIP() {
+            return ip;
+        }
+        
+        /**
+         *  Returns the port of the Connection this is related to
+         *  
+         *  @return port
+         */
+        public int getPort() {
+            return port;
+        }
     }
     
     @Override

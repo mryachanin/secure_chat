@@ -1,15 +1,13 @@
 package us.blint.securechat.connection;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import us.blint.securechat.client.Client;
 import us.blint.securechat.ui.ChatInterface;
 import us.blint.securechat.ui.packet.display.DisplayConnectionNameExistsPacket;
-import us.blint.securechat.ui.packet.error.ConnectIOErrorPacket;
 import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
 import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
 
@@ -32,11 +30,19 @@ public class ConnectionManager {
     private HashMap<String,Connection> connectionMap;
     
     private ConnectionManager() {
-        this.ui = Client.getChatInterface();
         pendingConnectionRequests = new ArrayList<ConnectionRequest>();
         connectionMap = new HashMap<String,Connection>();
     }
 
+    /**
+     *  Sets the user interface to interact with
+     *  
+     *  @param ui   User interface that extends ChatInterface
+     */
+    public void setUI(ChatInterface ui) {
+        this.ui = ui;
+    }
+    
     /**
      *  Request the user to accept a connection. This method should block the
      *  calling thread until the user either confirms or denies the request.
@@ -124,13 +130,14 @@ public class ConnectionManager {
      */
     public void connect(String ip, int port, String connectionName) {
         try {
-            Connection newConnection = new Connection(new Socket(ip, port), connectionName, this, true);
+            Socket s = new Socket(ip, port);
+            Connection newConnection = new Connection(s, connectionName, this, ui, true);
             connectionMap.put(connectionName, newConnection);
-        } catch (ConnectException e) {
-            ui.send(new ConnectionRefusedErrorPacket(e, connectionName, port));
+        } catch (UnknownHostException e) {
+            System.out.println("Not a known host, you're dumb");
             return;
         } catch(IOException e) {
-            ui.send(new ConnectIOErrorPacket(e));
+            ui.send(new ConnectionRefusedErrorPacket(e, connectionName, port));
         }
     }
 
@@ -143,7 +150,7 @@ public class ConnectionManager {
      *  @param  connectionName   Name of the connection for ease of reference
      */
     public void connect(Socket s, String connectionName) {
-        Connection newConnection = new Connection(s, connectionName, this, false);
+        Connection newConnection = new Connection(s, connectionName, this, ui, false);
         connectionMap.put(connectionName, newConnection);
     }
     
