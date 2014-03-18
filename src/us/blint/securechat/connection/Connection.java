@@ -28,7 +28,7 @@ public class Connection extends Thread {
     private String connectionName;
     private ConnectionManager cm;
     private ChatInterface ui;
-    private boolean finished;
+    private boolean accepted, finished;
     
     /**
      *  Initializes variables
@@ -37,10 +37,12 @@ public class Connection extends Thread {
      *  @param s    Socket between the client and another user
      *  @param connectionName       Name of this connection
      *  @param connectionManager    Manages all connections
+     *  @param accepted    True if the user initiated the connection
      */
-    public Connection(Socket s, String connectionName, ConnectionManager cm) {
+    public Connection(Socket s, String connectionName, ConnectionManager cm, boolean accepted) {
         this.s = s;
         this.connectionName = connectionName;
+        this.accepted = accepted;
         finished = false;
         
         this.cm = cm;
@@ -54,22 +56,24 @@ public class Connection extends Thread {
     }
     
     public void run() {
-        boolean allowed = cm.requestConnection(s.getInetAddress().getHostName(), s.getPort());
-        if(!allowed) {
-            ui.send(new DisplayConnectionDeclinedPacket(connectionName, s.getPort()));
-            try {
-                s.close();
-            } catch (IOException e) { e.printStackTrace(); }
-        } else {
-            ui.send(new DisplayConnectionAcceptedPacket(connectionName));
-            try {
-                String line;
-                while((line = in.readLine()) != null && !finished) {
-                    ui.send(new DisplayMessagePacket(line, connectionName));
-                }
-                s.close();
-            } catch(IOException e) { e.printStackTrace(); }
+        if(!accepted) {
+            boolean allowed = cm.requestConnection(s.getInetAddress().getHostName(), s.getPort());
+            if(!allowed) {
+                ui.send(new DisplayConnectionDeclinedPacket(connectionName, s.getPort()));
+                try {
+                    s.close();
+                } catch (IOException e) { e.printStackTrace(); }
+            }   
+            else 
+                ui.send(new DisplayConnectionAcceptedPacket(connectionName));
         }
+        try {
+            String line;
+            while((line = in.readLine()) != null && !finished) {
+                ui.send(new DisplayMessagePacket(line, connectionName));
+            }
+            s.close();
+        } catch(IOException e) { e.printStackTrace(); }
     }
     
     /**
@@ -78,7 +82,6 @@ public class Connection extends Thread {
      *  @param message String to send over the socket
      */
     public void sendMessage(String message) {
-        System.out.println("Message Sent!");
         out.println(message);
     }
     
