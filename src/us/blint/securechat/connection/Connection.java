@@ -14,12 +14,19 @@ import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 /**
  *  Defines a connection
  *
- *  When this thread starts, it will prompt the user to accept the connection.
- *      If the connection is accepted, the thread will continuously probe for 
- *      input from the socket associated with this connection and print the 
- *      input to the user. When the BufferedReader returns null, the socket is 
- *      closed
- *      If the user does not accept the connection, the socket is closed. 
+ *  When this thread starts, it will prompt the user to accept the connection 
+ *  if the user did not initiate it.
+ *      Case: User initiates request
+ *          the thread will continuously probe for input from the socket 
+ *          associated with this connection and print the input to the user. 
+ *          When the BufferedReader returns null, the socket is closed.
+ *      
+ *      Case: Other user initiates request:
+ *          If the connection is accepted, the thread will continuously probe for 
+ *          input from the socket associated with this connection and print the 
+ *          input to the user. When the BufferedReader returns null, the socket is 
+ *          closed.
+ *          If the user does not accept the connection, the socket is closed. 
  */
 public class Connection extends Thread {
     private Socket s;
@@ -34,10 +41,10 @@ public class Connection extends Thread {
      *  Initializes variables
      *  Starts main thread
      * 
-     *  @param s    Socket between the client and another user
-     *  @param connectionName       Name of this connection
-     *  @param connectionManager    Manages all connections
-     *  @param accepted    True if the user initiated the connection
+     *  @param s                   Socket between the client and another user
+     *  @param connectionName      Name of this connection
+     *  @param connectionManager   Manages all connections
+     *  @param accepted            True if the user initiated the connection
      */
     public Connection(Socket s, String connectionName, ConnectionManager cm, boolean accepted) {
         this.s = s;
@@ -79,7 +86,7 @@ public class Connection extends Thread {
     /**
      *  Sends a message to the socket's output stream
      * 
-     *  @param message String to send over the socket
+     *  @param message   String to send over the socket
      */
     public void sendMessage(String message) {
         out.println(message);
@@ -88,7 +95,7 @@ public class Connection extends Thread {
     /**
      *  Returns the name of this connection
      * 
-     *  @return Name of this connection
+     *  @return connectionName
      */
     public String getConnectionName() {
         return connectionName;
@@ -97,7 +104,7 @@ public class Connection extends Thread {
     /**
      *  Sets the name of this connection
      *  
-     *  @param connectionName New name of this connection
+     *  @param connectionName   New name of this connection
      */
     public void setConnectionName(String connectionName) {
         this.connectionName = connectionName;
@@ -111,14 +118,5 @@ public class Connection extends Thread {
      */
     public void close() throws IOException {
         finished = true;
-    }
-    
-    /**
-     *  Returns if the socket is closed
-     * 
-     *  @return Boolean representing if the socket is closed
-     */
-    public boolean isClosed() {
-        return s.isClosed();
     }
 }

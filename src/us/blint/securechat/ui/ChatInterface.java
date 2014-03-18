@@ -10,12 +10,14 @@ public interface ChatInterface {
 	/**
 	 *  Read a packet of input from the user interface
 	 *
-	 *  @return Packet read in
+	 *  @return Packet
 	 */
 	public Packet getInput();
 
 	/**
 	 *  Sends a packet to the user interface
+	 *  
+	 *  @param p   Packet to send to the user interface
 	 */
 	public void send(Packet p);
 }

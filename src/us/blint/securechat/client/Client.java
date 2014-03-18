@@ -16,7 +16,8 @@ import us.blint.securechat.server.Server;
  *      and send data securely over connections to other clients. 
  *      
  *  When this thread starts, it will:
- *      Continuously listen for commands and execute them
+ *      Continuously probe for command packets from the user interface and deal
+ *      with them accordingly
  */
 public class Client extends Thread {
     
@@ -36,7 +37,7 @@ public class Client extends Thread {
      *  Starts server thread
      *  Starts main thread
      *  
-     *  @param ui Defines the user interface
+     *  @param ui   String representation of the user interface class to use
      */
     public Client(String uiClassName) {
         this.cm = ConnectionManager.getInstance();
@@ -75,9 +76,11 @@ public class Client extends Thread {
     }
     
     /**
-     *  Instantiates a new client using the command interface
+     *  Instantiates a new client using the interface name passed in
      *  
-     *  @param args These will all be ignored
+     *  @param args
+     *          1) name of the user interface to use
+     *          2) null
      */
     public static void main(String[] args) {
         if(args.length < 1)

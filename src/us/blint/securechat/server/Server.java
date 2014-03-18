@@ -16,8 +16,10 @@ import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
  *  When started as a thread, this will:
  *      Continuously listen for new connection requests.
  *      When a new connection is found, the server will create a new 
- *          Connection object. All validation is handled in the Connection 
- *          object so multiple requests can be pending at once.
+ *          Connection object and send a packet to the user interface to signify
+ *          that a connection is pending.
+ *          All validation is handled in the Connection object so multiple 
+ *          requests can be pending at once.
  */
 public class Server extends Thread {
     private ServerSocket serverSocket;
@@ -27,7 +29,7 @@ public class Server extends Thread {
     
     /**
      *  Instantiates a new server socket
-     *  Prints the port it was started on
+     *  Sends user interface a packet with the port this server started on
      */
     public Server() {
         cm = ConnectionManager.getInstance();

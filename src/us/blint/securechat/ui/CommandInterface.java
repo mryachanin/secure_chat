@@ -19,7 +19,7 @@ import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
 import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
-import us.blint.securechat.ui.packet.error.ConnectErrorPacket;
+import us.blint.securechat.ui.packet.error.ConnectIOErrorPacket;
 import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
 import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
 
@@ -152,7 +152,7 @@ public class CommandInterface implements ChatInterface {
         }
         
     	else if(p instanceof DisplayConnectionDeclinedPacket) {
-    	    ip = ((DisplayConnectionDeclinedPacket)p).getip();
+    	    ip = ((DisplayConnectionDeclinedPacket)p).getIP();
     	    port = ((DisplayConnectionDeclinedPacket)p).getPort();
         	out.println("#### Declined connection from " + ip + ":" + port + " ####");
         }
@@ -169,13 +169,13 @@ public class CommandInterface implements ChatInterface {
     	}
         
     	else if(p instanceof ConnectionRefusedErrorPacket) {
-        	connectionName = ((ConnectionRefusedErrorPacket)p).getConnectionName();
+        	connectionName = ((ConnectionRefusedErrorPacket)p).getIP();
         	port = ((ConnectionRefusedErrorPacket)p).getPort();
     	    out.println("#### "+ connectionName + ":" + port + " declined your connection request ####");
         	pendingConnections.remove(connectionName + ":" + port);
     	}
         
-    	else if(p instanceof ConnectErrorPacket) {
+    	else if(p instanceof ConnectIOErrorPacket) {
         	out.println("Usage: /connect <ip> <port> <name>");
         }
         

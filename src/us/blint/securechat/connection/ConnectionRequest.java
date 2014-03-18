@@ -8,10 +8,10 @@ public class ConnectionRequest {
     private boolean accept;
     
     /**
-     *  Initializes connection name to value passed in
+     *  Initializes connection ip and port to values passed in
      * 
-     *  @param connectionName   Name of the connection associated with this request.
-     *  @param connectionNumber Unique number of the connection this request is associated with
+     *  @param ip     ip of the connection associated with this request.
+     *  @param port   Port of the connection associated with this request
      */
     public ConnectionRequest(String ip, int port) {
         this.ip = ip;
@@ -21,7 +21,7 @@ public class ConnectionRequest {
     /**
      *  Sets the boolean value signifying if the user has accepted this connection
      * 
-     *  @param isAccepted Boolean signifying if the user has accepted this connection
+     *  @param isAccepted   Boolean signifying if the user has accepted this connection
      */
     public void setAccepted(boolean isAccepted) {
         this.accept = isAccepted;
@@ -30,16 +30,16 @@ public class ConnectionRequest {
     /**
      *  Returns whether or not the user has accepted this connection
      * 
-     *  @return Boolean signifying if the user has accepted this connection
+     *  @return accept
      */
     public boolean isAccepted() {
         return accept;
     }
     
     /**
-     *  Returns the ip of the connection this request is associated with
+     *  Returns the IP of the connection this request is associated with
      *  
-     *  @return ip of the connection this request is associated with
+     *  @return ip
      */
     public String getip() {
         return ip;
@@ -48,7 +48,7 @@ public class ConnectionRequest {
     /**
      *  Returns the port of the connection this request is associated with
      * 
-     *  @return Port of the connection this request is associated with
+     *  @return port
      */
     public int getPort() {
         return port;

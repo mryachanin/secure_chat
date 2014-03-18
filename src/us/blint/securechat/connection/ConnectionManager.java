@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import us.blint.securechat.client.Client;
 import us.blint.securechat.ui.ChatInterface;
-import us.blint.securechat.ui.packet.error.ConnectErrorPacket;
+import us.blint.securechat.ui.packet.error.ConnectIOErrorPacket;
 import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
 import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
 
@@ -40,13 +40,13 @@ public class ConnectionManager {
      *  Request the user to accept a connection. This method should block the
      *  calling thread until the user either confirms or denies the request.
      *
-     *  @param connectionName ip of the requested connection
-     *  @param port Port of the requested connection
+     *  @param ip     IP of the requested connection
+     *  @param port   Port of the requested connection
      *
-     *  @return true is the user accepts the connection, false otherwise
+     *  @return true if the user accepts the connection, false otherwise
      */
-    public boolean requestConnection(String connectionName, int port) {
-        ConnectionRequest request = new ConnectionRequest(connectionName, port);
+    public boolean requestConnection(String ip, int port) {
+        ConnectionRequest request = new ConnectionRequest(ip, port);
         synchronized(pendingConnectionRequests) {
             pendingConnectionRequests.add(request);
         }
@@ -61,11 +61,12 @@ public class ConnectionManager {
     
     /**
      *  Allows messages to be received through the socket associated with this
-     *  Connection id
+     *  IP and port.
+     *  Assigns a name to the connection if one is provided.
      * 
-     *  @param ip Internet Protocol Address of the connection to accept
-     *  @param port Port of the connection to accept
-     *  @param connectionName Name of the connection that will be accepted
+     *  @param ip               IP address of the connection to accept
+     *  @param port             Port of the connection to accept
+     *  @param connectionName   Name of the connection that will be accepted
      */
     public void acceptConnection(String ip, int port, String connectionName) {
         synchronized(pendingConnectionRequests) {
@@ -80,17 +81,17 @@ public class ConnectionManager {
                 }
             }
         }
-        if(connectionMap.get(ip) != null) {
+        if(connectionName != null && connectionMap.get(ip) != null) {
             connectionMap.get(ip).setConnectionName(connectionName);
         }
     }
     
     /**
      *  Does not allow traffic to be received through the socket associated 
-     *  with this Connection id
+     *  with this IP and port
      * 
-     *  @param connectionName Name of the connection to decline
-     *  @param port Port of the connection to decline
+     *  @param ip     IP address of the connection to decline
+     *  @param port   Port of the connection to decline
      */
     public void declineConnection(String ip, int port) {
         synchronized(pendingConnectionRequests) {
@@ -109,11 +110,11 @@ public class ConnectionManager {
     /**
      *  Instantiates a new connection that was requested by the Client
      *  Associates the connection with a name
-     *  Adds the connection to hashmap with key:value = connection_name : Connection
+     *  Adds the connection to hashMap with key:value = connection_name : Connection
      *  
-     *  @param ip IP Address of the socket for a new connection
-     *  @param port Port of the socket for a new connection
-     *  @param connectionName Name of the connection for ease of reference
+     *  @param ip               IP Address of the socket for a new connection
+     *  @param port             Port of the socket for a new connection
+     *  @param connectionName   Name of the connection for ease of reference
      */
     public void connect(String ip, int port, String connectionName) {
         try {
@@ -123,17 +124,17 @@ public class ConnectionManager {
             ui.send(new ConnectionRefusedErrorPacket(e, connectionName, port));
             return;
         } catch(IOException e) {
-            ui.send(new ConnectErrorPacket(e));
+            ui.send(new ConnectIOErrorPacket(e));
         }
     }
 
     /**
      *  Instantiates a new connection that was requested by a different Client
      *  Associates the connection with a name
-     *  Adds the connection to hashmap with key:value = connection_name : Connection
+     *  Adds the connection to hashMap with key:value = connection_name : Connection
      * 
-     *  @param  s Socket for a new connection
-     *  @param  connectionName Name of the connection for ease of reference
+     *  @param  s                Socket for a new connection
+     *  @param  connectionName   Name of the connection for ease of reference
      */
     public void connect(Socket s, String connectionName) {
         Connection newConnection = new Connection(s, connectionName, this, false);
@@ -143,11 +144,12 @@ public class ConnectionManager {
     /**
      *  Disconnect a current connection
      *  
-     *  @param connectionName Name of the connection to disconnect from
+     *  @param connectionName   Name of the connection to disconnect from
      */
     public void disconnect(String connectionName) {
         try {
             connectionMap.get(connectionName).close();
+            connectionMap.remove(connectionName);
         } catch(Exception e) {
             ui.send(new DisconnectErrorPacket(e));
         }
@@ -156,8 +158,8 @@ public class ConnectionManager {
     /**
      *  Sends a message to a connection
      * 
-     *  @param connectionName Name of the connection to send messages
-     *  @param message Message to send to a connection
+     *  @param connectionName   Name of the connection to send messages
+     *  @param message          Message to send to a connection
      */
     public void sendMessage(String connectionName, String message) {
         connectionMap.get(connectionName).sendMessage(message);
