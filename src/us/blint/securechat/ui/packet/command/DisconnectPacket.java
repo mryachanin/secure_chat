@@ -6,23 +6,23 @@ import us.blint.securechat.ui.packet.Packet;
  *  Signifies that the user wants to disconnect from a connection.
  */
 public class DisconnectPacket extends Packet {
-    private String connectionName;
+    private int connectionID;
     
     /**
      *  Initializes variables
      *  
-     *  @param connectionName   Name of the connection to disconnect from
+     *  @param connectionID   ID of the connection to disconnect from
      */
-    public DisconnectPacket(String connectionName) {
-        this.connectionName = connectionName;
+    public DisconnectPacket(int connectionID) {
+        this.connectionID = connectionID;
     }
     
     /**
-     *  Returns the connection name to disconnect from
+     *  Returns the ID of the connection to disconnect from
      *  
-     *  @return connectionName
+     *  @return connectionID
      */
-    public String getConnectionName() {
-        return connectionName;
+    public int getConnectionID() {
+        return connectionID;
     }
 }

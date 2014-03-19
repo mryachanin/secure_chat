@@ -1,18 +1,19 @@
 package us.blint.securechat.ui.packet.error;
 
 /**
- *  Signifies that for some reason, the connection attempted was refused.
+ *  Not really sure... 
  */
-public class ConnectionRefusedErrorPacket extends ErrorPacket {
-	private int connectionID;
-	
+public class UnknownHostErrorPacket extends ErrorPacket {
+
+    private int connectionID;
+    
     /**
      *  Initialize variables
      *  
      *  @param e              Exception related to this error
-     *  @param connectionID   ID of the connection refused
+     *  @param connectionID   ID of the Connection related to the unknown host
      */
-    public ConnectionRefusedErrorPacket(Exception e, int connectionID) {
+    public UnknownHostErrorPacket(Exception e, int connectionID) {
         super(e);
         this.connectionID = connectionID;
     }
@@ -23,6 +24,6 @@ public class ConnectionRefusedErrorPacket extends ErrorPacket {
      *  @return connectionID
      */
     public int getConnectionID() {
-    	return connectionID;
+        return connectionID;
     }
 }

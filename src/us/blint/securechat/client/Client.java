@@ -32,7 +32,7 @@ public class Client extends Thread {
      *  <li>Initialize variables</li>
      *  <li>Starts server thread</li>
      *  <li>Starts main thread</li>
-     *  <ul>
+     *  </ul>
      *  
      *  @param ui   String representation of the user interface class to use
      */
@@ -50,23 +50,23 @@ public class Client extends Thread {
         Packet command;
         while((command = ui.getInput()) != null) {
             if(command instanceof AcceptConnectionPacket) {
-                cm.acceptConnection(((AcceptConnectionPacket)command).getip(), ((AcceptConnectionPacket)command).getPort(), ((AcceptConnectionPacket)command).getConnectionName());
+                cm.acceptConnection(((AcceptConnectionPacket)command).getConnectionID());
             }
             
             else if(command instanceof RequestConnectionPacket) {
-                cm.connect(((RequestConnectionPacket)command).getip(), ((RequestConnectionPacket)command).getPort(), ((RequestConnectionPacket)command).getConnectionName());
+                cm.connect(((RequestConnectionPacket)command).getip(), ((RequestConnectionPacket)command).getPort());
             }
             
             else if(command instanceof DeclineConnectionPacket) {
-                cm.declineConnection(((DeclineConnectionPacket)command).getip(), ((DeclineConnectionPacket)command).getPort());
+                cm.declineConnection(((DeclineConnectionPacket)command).getConnectionID());
             }
             
             else if(command instanceof DisconnectPacket) {
-                cm.disconnect(((DisconnectPacket)command).getConnectionName());
+                cm.disconnect(((DisconnectPacket)command).getConnectionID());
             }
             
             else if(command instanceof SendMessagePacket) {
-                cm.sendMessage(((SendMessagePacket)command).getConnectionName(), ((SendMessagePacket)command).getMessage());
+                cm.sendMessage(((SendMessagePacket)command).getConnectionID(), ((SendMessagePacket)command).getMessage());
             }
         }
     }

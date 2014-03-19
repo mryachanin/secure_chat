@@ -9,6 +9,7 @@ import java.net.Socket;
 import us.blint.securechat.ui.ChatInterface;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
+import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
 import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 
 /**
@@ -34,30 +35,35 @@ import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
  */
 public class Connection extends Thread {
     private Socket s;
-    private BufferedReader in;
-    private PrintWriter out;
-    private String connectionName;
+    private int connectionID;
     private ConnectionManager cm;
     private ChatInterface ui;
-    private boolean accepted, finished;
+    private boolean accepted;
+    private String ip;
+    private int port;
+    private boolean finished;
+    private BufferedReader in;
+    private PrintWriter out;
     
     /**
      *  Initialize variables
      *  Starts main thread
      * 
      *  @param s                   Socket between the client and another user
-     *  @param connectionName      Name of this connection
+     *  @param connectionID        ID of this connection
      *  @param connectionManager   Manages all connections
      *  @param accepted            True if the user initiated the connection
      */
-    public Connection(Socket s, String connectionName, ConnectionManager cm, ChatInterface ui, boolean accepted) {
+    public Connection(Socket s, int connectionID, ConnectionManager cm, ChatInterface ui, boolean accepted) {
         this.s = s;
-        this.connectionName = connectionName;
-        this.accepted = accepted;
-        finished = false;
-        
+        this.connectionID = connectionID;
         this.cm = cm;
         this.ui = ui;
+        this.accepted = accepted;
+        this.ip = s.getInetAddress().getHostName();
+        this.port = s.getPort();
+        finished = false;
+        
         try {
             this.in = new BufferedReader(
                           new InputStreamReader(s.getInputStream()));
@@ -68,20 +74,21 @@ public class Connection extends Thread {
     
     public void run() {
         if(!accepted) {
-            boolean allowed = cm.requestConnection(s.getInetAddress().getHostName(), s.getPort());
+            ui.send(new DisplayConnectionRequestPacket(connectionID, ip, port));
+            boolean allowed = cm.requestConnection(connectionID);
             if(!allowed) {
-                ui.send(new DisplayConnectionDeclinedPacket(connectionName, s.getPort()));
+                ui.send(new DisplayConnectionDeclinedPacket(connectionID));
                 try {
                     s.close();
                 } catch (IOException e) { e.printStackTrace(); }
             }   
             else 
-                ui.send(new DisplayConnectionAcceptedPacket(connectionName));
+                ui.send(new DisplayConnectionAcceptedPacket(connectionID, ip, port));
         }
         try {
             String line;
             while((line = in.readLine()) != null && !finished) {
-                ui.send(new DisplayMessagePacket(line, connectionName));
+                ui.send(new DisplayMessagePacket(line, connectionID));
             }
             s.close();
         } catch(IOException e) { e.printStackTrace(); }
@@ -97,21 +104,12 @@ public class Connection extends Thread {
     }
     
     /**
-     *  Returns the name of this connection
+     *  Returns the ID of this connection
      * 
-     *  @return connectionName
+     *  @return connectionID
      */
-    public String getConnectionName() {
-        return connectionName;
-    }
-    
-    /**
-     *  Sets the name of this connection
-     *  
-     *  @param connectionName   New name of this connection
-     */
-    public void setConnectionName(String connectionName) {
-        this.connectionName = connectionName;
+    public int getConnectionID() {
+        return connectionID;
     }
     
     /**

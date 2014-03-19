@@ -6,17 +6,18 @@ import us.blint.securechat.ui.packet.Packet;
  *  Signifies to the user interface that a message has been received.
  */
 public class DisplayMessagePacket extends Packet {
-    private String message, connectionName;
+    private String message;
+    private int connectionID;
     
     /**
      *  Initialize variables
      *  
-     *  @param message          Message received
-     *  @param connectionName   Name of the connection that sent the message
+     *  @param message        Message received
+     *  @param connectionID   ID of the connection that sent the message
      */
-    public DisplayMessagePacket(String message, String connectionName) {
+    public DisplayMessagePacket(String message, int connectionID) {
         this.message = message;
-        this.connectionName = connectionName;
+        this.connectionID = connectionID;
     }
     
     /**
@@ -29,11 +30,11 @@ public class DisplayMessagePacket extends Packet {
     }
     
     /**
-     *  Returns the name of the connection that sent the message
+     *  Returns the ID of the connection that sent the message
      *  
-     *  @return connectionName
+     *  @return connectionID
      */
-    public String getConnectionName() {
-    	return connectionName;
+    public int getConnectionID() {
+    	return connectionID;
     }
 }

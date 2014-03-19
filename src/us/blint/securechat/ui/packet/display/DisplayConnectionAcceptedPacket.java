@@ -3,26 +3,49 @@ package us.blint.securechat.ui.packet.display;
 import us.blint.securechat.ui.packet.Packet;
 
 /**
- *  Signifies to the user interface that a connection has been accepted.
+ *  Signifies to the user interface that a connection has been accepted by the remote client.
  */
 public class DisplayConnectionAcceptedPacket extends Packet {
-    private String connectionName;
+    private String ip;
+    private int connectionID, port;
     
     /**
      *  Initialize variables
      *  
-     *  @param connectionName   Name of the connection accepted
+     *  @param connectionID   ID of the connection accepted
+     *  @param ip             IP of the connection accepted
+     *  @param port           Port of the connection accepted
      */
-    public DisplayConnectionAcceptedPacket(String connectionName) {
-    	this.connectionName = connectionName;
+    public DisplayConnectionAcceptedPacket(int connectionID, String ip, int port) {
+    	this.connectionID = connectionID;
+    	this.ip = ip;
+    	this.port = port;
     }
     
     /**
-     *  Returns the connection name of the connection accepted
+     *  Returns the ID of the connection that was accepted
      *  
-     *  @return connectionName
+     *  @return connectionID
      */
-    public String getConnectionName() {
-    	return connectionName;
+    public int getConnectionID() {
+    	return connectionID;
+    }
+    
+    /**
+     *  Returns the IP address of the connection that was accepted
+     *  
+     *  @return ip
+     */
+    public String getIP() {
+        return ip;
+    }
+    
+    /**
+     *  Returns the port of the connection that was accepted
+     *  
+     *  @return port
+     */
+    public int getPort() {
+        return port;
     }
 }

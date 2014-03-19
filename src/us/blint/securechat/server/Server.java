@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import us.blint.securechat.client.Client;
 import us.blint.securechat.connection.ConnectionManager;
 import us.blint.securechat.ui.ChatInterface;
-import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
 import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
 
 /**
@@ -47,9 +45,7 @@ public class Server extends Thread {
         Socket clientSocket;
         try {
             clientSocket = serverSocket.accept();
-            String ip = clientSocket.getInetAddress().getHostName();
-            ui.send(new DisplayConnectionRequestPacket(ip, clientSocket.getPort()));
-            cm.connect(clientSocket, ip);
+            cm.connect(clientSocket);
         } catch (IOException e) { e.printStackTrace(); }
     }
 }

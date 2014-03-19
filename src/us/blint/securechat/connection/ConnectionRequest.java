@@ -1,21 +1,18 @@
 package us.blint.securechat.connection;
 /**
- *  Stores the name, number, and state of a pending request.
+ *  Stores the ID and state of a pending request.
  */
 public class ConnectionRequest {
-    private String ip;
-    private int port;
+    private int connectionID;
     private boolean accept;
     
     /**
      *  Initialize variables
      * 
-     *  @param ip     ip of the connection associated with this request.
-     *  @param port   Port of the connection associated with this request
+     *  @param connectionID   ID of the connection associated with this request.
      */
-    public ConnectionRequest(String ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    public ConnectionRequest(int connectionID) {
+        this.connectionID = connectionID;
     }
     
     /**
@@ -37,20 +34,11 @@ public class ConnectionRequest {
     }
     
     /**
-     *  Returns the IP of the connection this request is associated with
+     *  Returns the ID of the connection this request is associated with
      *  
-     *  @return ip
+     *  @return connectionID
      */
-    public String getip() {
-        return ip;
-    }
-    
-    /**
-     *  Returns the port of the connection this request is associated with
-     * 
-     *  @return port
-     */
-    public int getPort() {
-        return port;
+    public int getConnectionID() {
+        return connectionID;
     }
 }

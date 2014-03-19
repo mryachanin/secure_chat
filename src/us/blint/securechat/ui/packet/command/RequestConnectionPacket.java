@@ -6,7 +6,7 @@ import us.blint.securechat.ui.packet.Packet;
  *  Signifies that the user wants to connect to another client.
  */
 public class RequestConnectionPacket extends Packet {
-    private String ip, connectionName;
+    private String ip;
     private int port;
     
     /**
@@ -14,12 +14,10 @@ public class RequestConnectionPacket extends Packet {
      *  
      *  @param ip               IP of the server to connect to
      *  @param port             Port of the server to connect to
-     *  @param connectionName   New name for this connection
      */
-    public RequestConnectionPacket(String ip, int port, String connectionName) {
+    public RequestConnectionPacket(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.connectionName = connectionName;
     }
     
     /**
@@ -38,14 +36,5 @@ public class RequestConnectionPacket extends Packet {
      */
     public int getPort() {
         return port;
-    }
-    
-    /**
-     *  Returns the new name for this connection
-     *  
-     *  @return connectionName
-     */
-    public String getConnectionName() {
-        return connectionName;
     }
 }

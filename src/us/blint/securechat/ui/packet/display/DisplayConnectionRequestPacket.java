@@ -7,17 +7,28 @@ import us.blint.securechat.ui.packet.Packet;
  */
 public class DisplayConnectionRequestPacket extends Packet {
 	private String ip;
-	private int port;
+	private int connectionID, port;
 	
 	/**
 	 *  Initialize variables
 	 * 
-	 *  @param ip     IP address of the client requesting the connection
-	 *  @param port   Port of the client requesting the connection
+	 *  @param connectionID   ID of the connection
+	 *  @param ip             IP address of the client requesting the connection
+	 *  @param port           Port of the client requesting the connection
 	 */
-	public DisplayConnectionRequestPacket(String ip, int port) {
-		this.ip = ip;
+	public DisplayConnectionRequestPacket(int connectionID, String ip, int port) {
+		this.connectionID = connectionID;
+	    this.ip = ip;
 		this.port = port;
+	}
+	
+	/**
+	 *  Returns the ID of the connection
+	 *  
+	 *  @return connectionID
+	 */
+	public int getConnectionID() {
+	    return connectionID;
 	}
 	
 	/**
@@ -25,12 +36,13 @@ public class DisplayConnectionRequestPacket extends Packet {
 	 *  
 	 *  @return ip
 	 */
-	public String getip() {
+	public String getIP() {
 		return ip;
 	}
 	
 	/**
 	 *  Returns the port of the client requesting the connection
+	 *  
 	 *  @return port
 	 */
 	public int getPort() {

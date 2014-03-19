@@ -6,26 +6,27 @@ import us.blint.securechat.ui.packet.Packet;
  *  Signifies that the user wants to send a message to a connection.
  */
 public class SendMessagePacket extends Packet {
-    private String connectionName, message;
+    private int connectionID;
+    private String message;
     
     /**
      * Initializes variables
      * 
-     *  @param connectionName   Name of the connection to send a message
-     *  @param message          Message to send to a connection
+     *  @param connectionID   ID of the connection to send a message
+     *  @param message        Message to send to a connection
      */
-    public SendMessagePacket(String connectionName, String message) {
-        this.connectionName = connectionName;
+    public SendMessagePacket(int connectionID, String message) {
+        this.connectionID = connectionID;
         this.message = message;
     }
     
     /**
-     *  Returns the name of the connection to send a message
+     *  Returns the ID of the connection to send a message
      * 
-     *  @return connectionName
+     *  @return connectionID
      */
-    public String getConnectionName() {
-        return connectionName;
+    public int getConnectionID() {
+        return connectionID;
     }
     
     /**

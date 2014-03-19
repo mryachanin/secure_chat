@@ -4,37 +4,25 @@ import us.blint.securechat.ui.packet.Packet;
 
 /**
  *  Signifies that the user has declined a connection.
- *  Contains the IP and port of the connection declined.
  */
 public class DeclineConnectionPacket extends Packet {
-    private String ip;
-    private int port;
+    private int connectionID;
     
     /**
      *  Initializes Variables
      *  
-     *  @param ip     IP if the connection declined
-     *  @param port   Port of the connection declined
+     *  @param connectionID   ID of the connection declined
      */
-    public DeclineConnectionPacket(String ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    public DeclineConnectionPacket(int connectionID) {
+        this.connectionID = connectionID;
     }
     
     /**
-     *  Returns the IP address of the connection declined
+     *  Returns the ID of the connection declined
      *  
-     *  @return ip
+     *  @return connectionID
      */
-    public String getip() {
-        return ip;
-    }
-    
-    /**
-     *  Returns the port of the connection declined
-     *  @return port
-     */
-    public int getPort() {
-        return port;
+    public int getConnectionID() {
+        return connectionID;
     }
 }
