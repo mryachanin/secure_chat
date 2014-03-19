@@ -336,7 +336,7 @@ public class CommandInterface implements ChatInterface {
         int id, port;
         String connectionName = "";
     	if(p instanceof DisplayMessagePacket) {
-    	    id = connectionMap.get(((DisplayMessagePacket)p).getConnectionID()).getID();
+    	    id = ((DisplayMessagePacket)p).getConnectionID();
     	    for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
                 if(con.getValue().getID() == id)
                     connectionName = con.getKey();

@@ -119,15 +119,15 @@ public class ConnectionManager {
      *  @param port   Port of the socket for a new connection
      */
     public void connect(String ip, int port) {
-        int id = uniqueConnectionID++;
+        int connectionID = uniqueConnectionID++;
         try {
             Socket s = new Socket(ip, port);
-            Connection newConnection = new Connection(s, id, this, ui, true);
-            connectionMap.put(id, newConnection);
+            Connection newConnection = new Connection(s, connectionID, this, ui, true);
+            connectionMap.put(connectionID, newConnection);
         } catch (UnknownHostException e) {
-            ui.send(new UnknownHostErrorPacket(e, id));
+            ui.send(new UnknownHostErrorPacket(e, connectionID));
         } catch(IOException e) {
-            ui.send(new ConnectionRefusedErrorPacket(e, id));
+            ui.send(new ConnectionRefusedErrorPacket(e, connectionID));
         }
     }
 
