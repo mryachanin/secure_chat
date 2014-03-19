@@ -134,7 +134,7 @@ public class CommandInterface implements ChatInterface {
             switch(inputArray.pop()) {
                 case "/accept":
                     // This command takes 2 or 3 arguments
-                    if(inputArray.size() > 1 || inputArray.size() < 4) {
+                    if(inputArray.size() > 1 && inputArray.size() < 4) {
                         try {
                             ip = inputArray.pop();
                             port = Integer.parseInt(inputArray.pop());               
@@ -178,7 +178,7 @@ public class CommandInterface implements ChatInterface {
                
                 case "/connect":
                     // This command takes 2 or 3 arguments
-                    if(inputArray.size() > 1 || inputArray.size() < 4) {
+                    if(inputArray.size() > 1 && inputArray.size() < 4) {
                         try {
                             ip = inputArray.pop();
                             port = Integer.parseInt(inputArray.pop());
