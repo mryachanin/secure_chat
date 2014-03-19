@@ -143,10 +143,12 @@ public class CommandInterface implements ChatInterface {
             
             // Check to see if  this a command or a message
             if(line.charAt(0) != '/') {
-                if(sendMessageID != -1)
-                    return new SendMessagePacket(sendMessageID, line);
-                else
+                // If sendMessageID == -1, the user has not tried to send a message
+                // Assume the user mistyped and return valid commands
+                if(sendMessageID == -1)
                     out.println(VALID_COMMANDS);
+                else
+                    return new SendMessagePacket(sendMessageID, line);
             }
             
             LinkedList<String> inputArray = new LinkedList<String>(Arrays.asList(line.split("\\s+")));
