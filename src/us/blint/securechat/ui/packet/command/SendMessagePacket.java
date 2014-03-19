@@ -13,7 +13,7 @@ public class SendMessagePacket extends Packet {
      * Initializes variables
      * 
      *  @param connectionID   ID of the connection to send a message
-     *  @param message        Message to send to a connection
+     *  @param message        Message to send
      */
     public SendMessagePacket(int connectionID, String message) {
         this.connectionID = connectionID;
@@ -30,7 +30,7 @@ public class SendMessagePacket extends Packet {
     }
     
     /**
-     *  Returns the message to send to a connection
+     *  Returns the message to send
      *  
      *  @return message
      */
