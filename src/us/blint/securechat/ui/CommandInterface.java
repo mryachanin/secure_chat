@@ -354,6 +354,7 @@ public class CommandInterface implements ChatInterface {
                 if(ci.getIP().equals(ip) && ci.getPort() == port) {
                     ci.setID(id);
                     ci.setAccepted(true);
+                    connectionName = con.getKey();
                 }
             }
         	out.println("#### You are now connected to " + connectionName + " ####");
