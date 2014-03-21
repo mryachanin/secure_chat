@@ -142,188 +142,191 @@ public class CommandInterface implements ChatInterface {
         try {
             String line = in.readLine();
             
-            // Check to see if  this a command or a message
-            if(line.charAt(0) != '/') {
-                // If sendMessageID == -1, the user has not tried to send a message
-                // Assume the user mistyped and return valid commands
-                if(sendMessageID == -1)
-                    out.println(VALID_COMMANDS);
-                else
-                    return new SendMessagePacket(sendMessageID, line);
-            }
-            
-            LinkedList<String> inputArray = new LinkedList<String>(Arrays.asList(line.split("\\s+")));
-            String command = inputArray.pop();
-            
-            String ip, connectionName;
-            int id, port;
-            
-            if(command.equals("/accept")) {
-                // This command takes 2 or 3 arguments
-                if(inputArray.size() > 1 && inputArray.size() < 4) {
-                    try {
-                        ip = inputArray.pop();
-                        port = Integer.parseInt(inputArray.pop());               
-                        
-                        // Check if connection actually exists
-                        if(connectionMap.get(ip + ":" + port) != null) {
-                            
-                            // Check if user typed a new name for the connection
-                            if(inputArray.size() > 0) {
-                                connectionName = inputArray.pop();
-                                
-                                // Check if that name already exists and loop until the user chooses an unused name
-                                while(connectionMap.containsKey(connectionName)) {
-                                    out.println("Either that connection name is already in use, or you typed a name with spaces. Please type another name.");
-                                    String newConnectionName = in.readLine();
-                                    
-                                    // Names must not have spaces
-                                    if(!newConnectionName.contains(" "))
-                                        connectionName = newConnectionName;
-                                }
-                                ConnectionInfo ci = connectionMap.get(ip + ":" + port);
-                                connectionMap.put(connectionName, ci);
-                                connectionMap.remove(ip + ":" + port);
-                                connectionMap.get(connectionName).setAccepted(true);
-                                id = connectionMap.get(connectionName).getID();
-                            }
-                            
-                            // else assume that the connection will be referred to by ip:port
-                            else {
-                                connectionMap.get(ip + ":" + port).setAccepted(true);
-                                id = connectionMap.get(ip + ":" + port).getID();
-                            }
-                            
-                            return new AcceptConnectionPacket(id);
-                        }
-                    } catch(NumberFormatException e) {}
-                }
-                out.println("Usage: " + ACCEPT_COMMAND);
-            }
-    
-            else if(command.equals("/close")) {
-                // This command takes 0 arguments
-                if(inputArray.size() == 0)
-                    sendMessageID = -1;
-                else
-                    out.println("Usage: " + CLOSE_COMMAND);
-            }
-            
-            else if(command.equals("/connect")) {
-                // This command takes 2 or 3 arguments
-                if(inputArray.size() > 1 && inputArray.size() < 4) {
-                    try {
-                        ip = inputArray.pop();
-                        port = Integer.parseInt(inputArray.pop());
-                        
-                        // Check if user typed a name for the connection
-                        if(inputArray.size() > 0) {
-                            connectionName = inputArray.pop();
-                            
-                            // Check if that name already exists and loop until the user chooses an unused name
-                            while(connectionMap.containsKey(connectionName)) {
-                                out.println("Either that connection name is already in use, or you typed a name with spaces. Please type another name.");
-                                String newConnectionName = in.readLine();
-                                
-                                // Names must not have spaces
-                                if(!newConnectionName.contains(" "))
-                                    connectionName = newConnectionName;
-                            }
-                            connectionMap.put(connectionName, new ConnectionInfo(ip, port, false));
-                        }
-                        else 
-                            connectionMap.put(ip + ":" + port, new ConnectionInfo(ip, port, false));
-                        
-                        return new RequestConnectionPacket(ip, port);
-                        
-                    } catch(NumberFormatException e) {}
-                }
-                out.println("Usage: " + CONNECT_COMMAND);
-            }
-    
-            
-            else if(command.equals("/decline")) {
-                // This command takes 2 arguments
-                if(inputArray.size() == 2) {
-                    try {
-                        ip = inputArray.pop();
-                        port = Integer.parseInt(inputArray.pop());
-                        
-                        // Check if connection actually exists
-                        if(connectionMap.get(ip + ":" + port) != null) {
-                            id = connectionMap.get(ip + ":" + port).getID();
-                            return new DeclineConnectionPacket(id);
-                        }
-                    } catch(NumberFormatException e) {}
-                }
-                out.println("Usage: " + DECLINE_COMMAND);
-            }
-    
-            
-            else if(command.equals("/disconnect")) {
-                // This command takes 1 argument
-                if(inputArray.size() == 1) {
-                    connectionName = inputArray.pop();
-                    
-                    // Check if connection actually exists
-                    if(connectionMap.get(connectionName) != null) {
-                        id = connectionMap.get(connectionName).getID();
-                        return new DisconnectPacket(id);
-                    }
-                }
-                out.println("Usage: " + DISCONNECT_COMMAND);
-            }
-    
-            
-            else if(command.equals("/list")) {
-                // This command takes 0 arguments
-                if(inputArray.size() == 0) {
-                    out.println("#### Connected To ####");
-                    for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
-                        if(con.getValue().accepted)
-                            out.println(con.getKey());
-                    }
-                }
-                else
-                    out.println("Usage: " + LIST_COMMAND);
-            }
-       
-            
-            else if(command.equals("/msg")) {
-                // This command accepts 1 argument
-                if(inputArray.size() == 1) {
-                    connectionName = inputArray.pop();
-                    
-                    // Check if connection actually exists
-                    if(connectionMap.get(connectionName) != null) {
-                        sendMessageID = connectionMap.get(connectionName).getID();
-                    }
-                }
-                else
-                    out.println("Usage: " + MSG_COMMAND);
-            }
-            
-            
-            else if(command.equals("/pending")) {
-                // This command takes 0 arguments
-                if(inputArray.size() == 0) {
-                    out.println("#### Pending Connections ####");
-                    for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
-                        if(!con.getValue().accepted)
-                            out.println(con.getKey());
-                    }
-                }
-                else
-                    out.println("Usage: " + PENDING_COMMAND);
-            }
-                
-            
-            else if(command.equals("/quit")) {
-                System.exit(0);
-            }
-                
-            else {
-                out.println(VALID_COMMANDS);
+            // Check to see if a command was typed
+            if(line != null) {
+	            // Check to see if  this a command or a message
+	            if(line.charAt(0) != '/') {
+	                // If sendMessageID == -1, the user has not tried to send a message
+	                // Assume the user mistyped and return valid commands
+	                if(sendMessageID == -1)
+	                    out.println(VALID_COMMANDS);
+	                else
+	                    return new SendMessagePacket(sendMessageID, line);
+	            }
+	            
+	            LinkedList<String> inputArray = new LinkedList<String>(Arrays.asList(line.split("\\s+")));
+	            String command = inputArray.pop();
+	            
+	            String ip, connectionName;
+	            int id, port;
+	            
+	            if(command.equals("/accept")) {
+	                // This command takes 2 or 3 arguments
+	                if(inputArray.size() > 1 && inputArray.size() < 4) {
+	                    try {
+	                        ip = inputArray.pop();
+	                        port = Integer.parseInt(inputArray.pop());               
+	                        
+	                        // Check if connection actually exists
+	                        if(connectionMap.get(ip + ":" + port) != null) {
+	                            
+	                            // Check if user typed a new name for the connection
+	                            if(inputArray.size() > 0) {
+	                                connectionName = inputArray.pop();
+	                                
+	                                // Check if that name already exists and loop until the user chooses an unused name
+	                                while(connectionMap.containsKey(connectionName)) {
+	                                    out.println("Either that connection name is already in use, or you typed a name with spaces. Please type another name.");
+	                                    String newConnectionName = in.readLine();
+	                                    
+	                                    // Names must not have spaces
+	                                    if(!newConnectionName.contains(" "))
+	                                        connectionName = newConnectionName;
+	                                }
+	                                ConnectionInfo ci = connectionMap.get(ip + ":" + port);
+	                                connectionMap.put(connectionName, ci);
+	                                connectionMap.remove(ip + ":" + port);
+	                                connectionMap.get(connectionName).setAccepted(true);
+	                                id = connectionMap.get(connectionName).getID();
+	                            }
+	                            
+	                            // else assume that the connection will be referred to by ip:port
+	                            else {
+	                                connectionMap.get(ip + ":" + port).setAccepted(true);
+	                                id = connectionMap.get(ip + ":" + port).getID();
+	                            }
+	                            
+	                            return new AcceptConnectionPacket(id);
+	                        }
+	                    } catch(NumberFormatException e) {}
+	                }
+	                out.println("Usage: " + ACCEPT_COMMAND);
+	            }
+	    
+	            else if(command.equals("/close")) {
+	                // This command takes 0 arguments
+	                if(inputArray.size() == 0)
+	                    sendMessageID = -1;
+	                else
+	                    out.println("Usage: " + CLOSE_COMMAND);
+	            }
+	            
+	            else if(command.equals("/connect")) {
+	                // This command takes 2 or 3 arguments
+	                if(inputArray.size() > 1 && inputArray.size() < 4) {
+	                    try {
+	                        ip = inputArray.pop();
+	                        port = Integer.parseInt(inputArray.pop());
+	                        
+	                        // Check if user typed a name for the connection
+	                        if(inputArray.size() > 0) {
+	                            connectionName = inputArray.pop();
+	                            
+	                            // Check if that name already exists and loop until the user chooses an unused name
+	                            while(connectionMap.containsKey(connectionName)) {
+	                                out.println("Either that connection name is already in use, or you typed a name with spaces. Please type another name.");
+	                                String newConnectionName = in.readLine();
+	                                
+	                                // Names must not have spaces
+	                                if(!newConnectionName.contains(" "))
+	                                    connectionName = newConnectionName;
+	                            }
+	                            connectionMap.put(connectionName, new ConnectionInfo(ip, port, false));
+	                        }
+	                        else 
+	                            connectionMap.put(ip + ":" + port, new ConnectionInfo(ip, port, false));
+	                        
+	                        return new RequestConnectionPacket(ip, port);
+	                        
+	                    } catch(NumberFormatException e) {}
+	                }
+	                out.println("Usage: " + CONNECT_COMMAND);
+	            }
+	    
+	            
+	            else if(command.equals("/decline")) {
+	                // This command takes 2 arguments
+	                if(inputArray.size() == 2) {
+	                    try {
+	                        ip = inputArray.pop();
+	                        port = Integer.parseInt(inputArray.pop());
+	                        
+	                        // Check if connection actually exists
+	                        if(connectionMap.get(ip + ":" + port) != null) {
+	                            id = connectionMap.get(ip + ":" + port).getID();
+	                            return new DeclineConnectionPacket(id);
+	                        }
+	                    } catch(NumberFormatException e) {}
+	                }
+	                out.println("Usage: " + DECLINE_COMMAND);
+	            }
+	    
+	            
+	            else if(command.equals("/disconnect")) {
+	                // This command takes 1 argument
+	                if(inputArray.size() == 1) {
+	                    connectionName = inputArray.pop();
+	                    
+	                    // Check if connection actually exists
+	                    if(connectionMap.get(connectionName) != null) {
+	                        id = connectionMap.get(connectionName).getID();
+	                        return new DisconnectPacket(id);
+	                    }
+	                }
+	                out.println("Usage: " + DISCONNECT_COMMAND);
+	            }
+	    
+	            
+	            else if(command.equals("/list")) {
+	                // This command takes 0 arguments
+	                if(inputArray.size() == 0) {
+	                    out.println("#### Connected To ####");
+	                    for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
+	                        if(con.getValue().accepted)
+	                            out.println(con.getKey());
+	                    }
+	                }
+	                else
+	                    out.println("Usage: " + LIST_COMMAND);
+	            }
+	       
+	            
+	            else if(command.equals("/msg")) {
+	                // This command accepts 1 argument
+	                if(inputArray.size() == 1) {
+	                    connectionName = inputArray.pop();
+	                    
+	                    // Check if connection actually exists
+	                    if(connectionMap.get(connectionName) != null) {
+	                        sendMessageID = connectionMap.get(connectionName).getID();
+	                    }
+	                }
+	                else
+	                    out.println("Usage: " + MSG_COMMAND);
+	            }
+	            
+	            
+	            else if(command.equals("/pending")) {
+	                // This command takes 0 arguments
+	                if(inputArray.size() == 0) {
+	                    out.println("#### Pending Connections ####");
+	                    for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
+	                        if(!con.getValue().accepted)
+	                            out.println(con.getKey());
+	                    }
+	                }
+	                else
+	                    out.println("Usage: " + PENDING_COMMAND);
+	            }
+	                
+	            
+	            else if(command.equals("/quit")) {
+	                System.exit(0);
+	            }
+	                
+	            else {
+	                out.println(VALID_COMMANDS);
+	            }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -388,7 +391,7 @@ public class CommandInterface implements ChatInterface {
     	}
     	
     	else if(p instanceof DisplayConnectionRequestedPacket) {
-    		id = ((DisplayConnectionAcceptedPacket)p).getConnectionID();
+    		id = ((DisplayConnectionRequestedPacket)p).getConnectionID();
     		for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
                 if(con.getValue().getID() == id)
                     connectionName = con.getKey();
