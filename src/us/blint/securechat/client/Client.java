@@ -37,7 +37,7 @@ public class Client extends Thread {
      *  @param ui   String representation of the user interface class to use
      */
     public Client(String uiClassName) {
-        ui= new CommandInterface();
+        ui = new CommandInterface();
         cm = ConnectionManager.getInstance();
         cm.setUI(ui);
         server = new Server(ui);

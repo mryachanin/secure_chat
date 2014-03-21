@@ -36,24 +36,25 @@ public class CommandInterface implements ChatInterface {
     private HashMap<String, ConnectionInfo> connectionMap;
     private int sendMessageID;
     
-    private final String ACCEPT_COMMAND = "/accept <ip> <port> <nickname (optional)>";
-    private final String CLOSE_COMMAND = "/close";
-    private final String CONNECT_COMMAND = "/connect <ip> <port> <nickname (optional)>";
-    private final String DECLINE_COMMAND = "/decline <ip> <port>";
+    private final String ACCEPT_COMMAND     = "/accept <ip> <port> <nickname (optional)>";
+    private final String CLOSE_COMMAND      = "/close";
+    private final String CONNECT_COMMAND    = "/connect <ip> <port> <nickname (optional)>";
+    private final String DECLINE_COMMAND    = "/decline <ip> <port>";
     private final String DISCONNECT_COMMAND = "/disconnect <connection name>";
-    private final String LIST_COMMAND = "/list";
-    private final String MSG_COMMAND = "/msg <connection name>";
-    private final String PENDING_COMMAND = "/pending";
-    private final String QUIT_COMMAND = "/quit";
-    private final String VALID_COMMANDS = "Valid commands:\n" + 
-                                          "\t" + ACCEPT_COMMAND + "\n" + 
-                                          "\t" + CONNECT_COMMAND + "\n" + 
-                                          "\t" + DECLINE_COMMAND + "\n" + 
-                                          "\t" + DISCONNECT_COMMAND + "\n" + 
-                                          "\t" + LIST_COMMAND + "\n" + 
-                                          "\t" + MSG_COMMAND + "\n" + 
-                                          "\t" + PENDING_COMMAND + "\n" + 
-                                          "\t" + QUIT_COMMAND;
+    private final String LIST_COMMAND       = "/list";
+    private final String MSG_COMMAND        = "/msg <connection name>";
+    private final String PENDING_COMMAND    = "/pending";
+    private final String QUIT_COMMAND       = "/quit";
+    private final String VALID_COMMANDS     = "Valid commands:\n" + 
+                                                  "\t" + ACCEPT_COMMAND + "\n" +
+                                                  "\t" + CLOSE_COMMAND + "\n" +
+                                                  "\t" + CONNECT_COMMAND + "\n" + 
+                                                  "\t" + DECLINE_COMMAND + "\n" + 
+                                                  "\t" + DISCONNECT_COMMAND + "\n" + 
+                                                  "\t" + LIST_COMMAND + "\n" + 
+                                                  "\t" + MSG_COMMAND + "\n" + 
+                                                  "\t" + PENDING_COMMAND + "\n" + 
+                                                  "\t" + QUIT_COMMAND;
     /**
      *  Initialize variables
      */

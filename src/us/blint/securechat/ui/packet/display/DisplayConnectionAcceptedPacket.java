@@ -12,8 +12,6 @@ public class DisplayConnectionAcceptedPacket extends Packet {
      *  Initialize variables
      *  
      *  @param connectionID   ID of the connection accepted
-     *  @param ip             IP of the connection accepted
-     *  @param port           Port of the connection accepted
      */
     public DisplayConnectionAcceptedPacket(int connectionID) {
     	this.connectionID = connectionID;

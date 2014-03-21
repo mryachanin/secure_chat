@@ -2,6 +2,10 @@ package us.blint.securechat.ui.packet.display;
 
 import us.blint.securechat.ui.packet.Packet;
 
+/**
+ *  Signifies that a connection request has been successfully sent to another client.
+ *
+ */
 public class DisplayConnectionRequestedPacket extends Packet {
 	int connectionID, port;
 	String ip;
