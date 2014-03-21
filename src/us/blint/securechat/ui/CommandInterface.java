@@ -351,15 +351,12 @@ public class CommandInterface implements ChatInterface {
         
     	else if(p instanceof DisplayConnectionAcceptedPacket) {
     	    id = ((DisplayConnectionAcceptedPacket)p).getConnectionID();
-    	    ip = ((DisplayConnectionAcceptedPacket)p).getIP();
-    	    port = ((DisplayConnectionAcceptedPacket)p).getPort();
             for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
-                ConnectionInfo ci = con.getValue();
-                if(ci.getIP().equals(ip) && ci.getPort() == port) {
-                    ci.setID(id);
-                    ci.setAccepted(true);
+            	ConnectionInfo ci = con.getValue();
+            	if(ci.getID() == id) {
+            		ci.setAccepted(true);
                     connectionName = con.getKey();
-                }
+            	}
             }
         	out.println("#### You are now connected to " + connectionName + " ####");
         }
@@ -392,9 +389,14 @@ public class CommandInterface implements ChatInterface {
     	
     	else if(p instanceof DisplayConnectionRequestedPacket) {
     		id = ((DisplayConnectionRequestedPacket)p).getConnectionID();
-    		for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
-                if(con.getValue().getID() == id)
+    		ip = ((DisplayConnectionRequestedPacket)p).getIP();
+    	    port = ((DisplayConnectionRequestedPacket)p).getPort();
+            for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
+                ConnectionInfo ci = con.getValue();
+                if(ci.getIP().equals(ip) && ci.getPort() == port) {
+                    ci.setID(id);
                     connectionName = con.getKey();
+                }
             }
     		out.println("#### Connection Request Successfully Sent To " + connectionName + " ####" );
     	}

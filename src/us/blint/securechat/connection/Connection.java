@@ -83,7 +83,7 @@ public class Connection extends Thread {
                 } catch (IOException e) { e.printStackTrace(); }
             }   
             else {
-                ui.send(new DisplayConnectionAcceptedPacket(connectionID, ip, port));
+                ui.send(new DisplayConnectionAcceptedPacket(connectionID));
                 sendMessage("1");
                 // send 512 bit ECC public key
                 // receive encrypted 256 bit key for AES
@@ -94,7 +94,7 @@ public class Connection extends Thread {
         	// listen for 512 bit ECC public key
         	try {
 				if(in.readLine().equals("1"))
-					ui.send(new DisplayConnectionAcceptedPacket(connectionID, ip, port));
+					ui.send(new DisplayConnectionAcceptedPacket(connectionID));
 				else
 					close();
 			} catch (IOException e) {}

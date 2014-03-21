@@ -125,7 +125,7 @@ public class ConnectionManager {
             Socket s = new Socket(ip, port);
             Connection newConnection = new Connection(s, connectionID, this, ui, true);
             connectionMap.put(connectionID, newConnection);
-            ui.send(new DisplayConnectionRequestedPacket(connectionID));
+            ui.send(new DisplayConnectionRequestedPacket(connectionID, ip, port));
         } catch (UnknownHostException e) {
             ui.send(new UnknownHostErrorPacket(e, connectionID));
         } catch(IOException e) {
