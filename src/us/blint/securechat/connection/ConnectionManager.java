@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import us.blint.securechat.ui.ChatInterface;
+import us.blint.securechat.ui.packet.display.DisplayConnectionRequestedPacket;
 import us.blint.securechat.ui.packet.error.ConnectionRefusedErrorPacket;
 import us.blint.securechat.ui.packet.error.DisconnectErrorPacket;
 import us.blint.securechat.ui.packet.error.UnknownHostErrorPacket;
@@ -124,6 +125,7 @@ public class ConnectionManager {
             Socket s = new Socket(ip, port);
             Connection newConnection = new Connection(s, connectionID, this, ui, true);
             connectionMap.put(connectionID, newConnection);
+            ui.send(new DisplayConnectionRequestedPacket(connectionID));
         } catch (UnknownHostException e) {
             ui.send(new UnknownHostErrorPacket(e, connectionID));
         } catch(IOException e) {

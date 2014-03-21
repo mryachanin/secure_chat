@@ -18,6 +18,7 @@ import us.blint.securechat.ui.packet.command.SendMessagePacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionRequestPacket;
+import us.blint.securechat.ui.packet.display.DisplayConnectionRequestedPacket;
 import us.blint.securechat.ui.packet.display.DisplayMessagePacket;
 import us.blint.securechat.ui.packet.display.DisplayServerStartPacket;
 import us.blint.securechat.ui.packet.error.UnknownHostErrorPacket;
@@ -384,6 +385,15 @@ public class CommandInterface implements ChatInterface {
     	    ci.setID(id);
     	    
     		out.println("#### Incoming Request From " + ip + ":" + port + " ####");
+    	}
+    	
+    	else if(p instanceof DisplayConnectionRequestedPacket) {
+    		id = ((DisplayConnectionAcceptedPacket)p).getConnectionID();
+    		for(Entry<String, ConnectionInfo> con: connectionMap.entrySet()) {
+                if(con.getValue().getID() == id)
+                    connectionName = con.getKey();
+            }
+    		out.println("#### Connection Request Successfully Sent To " + connectionName + " ####" );
     	}
         
     	else if(p instanceof ConnectionRefusedErrorPacket) {

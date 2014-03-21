@@ -84,6 +84,7 @@ public class Connection extends Thread {
             }   
             else {
                 ui.send(new DisplayConnectionAcceptedPacket(connectionID, ip, port));
+                sendMessage("1");
                 // send 512 bit ECC public key
                 // receive encrypted 256 bit key for AES
                 // good to go
@@ -91,7 +92,12 @@ public class Connection extends Thread {
         }
         else {
         	// listen for 512 bit ECC public key
-        	ui.send(new DisplayConnectionAcceptedPacket(connectionID, ip, port));
+        	try {
+				if(in.readLine().equals("1"))
+					ui.send(new DisplayConnectionAcceptedPacket(connectionID, ip, port));
+				else
+					close();
+			} catch (IOException e) {}
         	// generate 256 bit key
         	// encrypt 256 bit key with ECC key
         	// send 256 bit key
