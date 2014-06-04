@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.SecureRandom;
 
+import us.blint.securechat.encryption.AES.AES;
+import us.blint.securechat.encryption.RSA.RSAPublicKey;
+import us.blint.securechat.encryption.RSA.RSAPrivateKey;
 import us.blint.securechat.ui.ChatInterface;
 import us.blint.securechat.ui.packet.display.DisplayConnectionAcceptedPacket;
 import us.blint.securechat.ui.packet.display.DisplayConnectionDeclinedPacket;
@@ -44,6 +48,8 @@ public class Connection extends Thread {
     private boolean finished;
     private BufferedReader in;
     private PrintWriter out;
+    private AES aes;
+    private SecureRandom rand;
     
     /**
      *  Initialize variables
@@ -62,7 +68,8 @@ public class Connection extends Thread {
         this.accepted = accepted;
         this.ip = s.getInetAddress().getHostName();
         this.port = s.getPort();
-        finished = false;
+        this.finished = false;
+        this.rand = new SecureRandom();
         
         try {
             this.in = new BufferedReader(
@@ -83,29 +90,44 @@ public class Connection extends Thread {
                 } catch (IOException e) { e.printStackTrace(); }
             }   
             else {
-                ui.send(new DisplayConnectionAcceptedPacket(connectionID));
-                sendMessage("1");
-                // send 512 bit ECC public key
-                // receive encrypted 256 bit key for AES
-                // good to go
+            	try {
+	                RSAPrivateKey RSA_key = new RSAPrivateKey();
+	                sendMessage(RSA_key.getPublicExponent());
+	                sendMessage(RSA_key.getMod());
+	                sendMessage(RSA_key.encrypt(RSA_key.getPublicExponent()));
+	                sendMessage(RSA_key.encrypt(RSA_key.getMod()));
+	                String encrypted_AES_key = in.readLine();
+	                byte[] AES_key = RSA_key.decrypt(encrypted_AES_key).getBytes();
+	                this.aes = new AES(AES_key);
+	                ui.send(new DisplayConnectionAcceptedPacket(connectionID));
+            	} catch (IOException e) {}
             }
         }
         else {
-        	// listen for 512 bit ECC public key
         	try {
-				if(in.readLine().equals("1"))
+				String RSA_public_exponent = in.readLine();
+				String mod = in.readLine();
+				String RSA_public_exponent_signature = in.readLine();
+				String mod_signature = in.readLine();
+        		RSAPublicKey RSA_key = new RSAPublicKey(RSA_public_exponent, mod);
+        		if (!RSA_public_exponent.equals(RSA_key.decrypt(RSA_public_exponent_signature)) || !mod.equals(RSA_key.decrypt(mod_signature))) {
+        			ui.send(new DisplayConnectionDeclinedPacket(connectionID));
+        			close();
+        		}
+        		else {
+		        	byte[] AES_key = new byte[16];
+					rand.nextBytes(AES_key);
+		        	String encrypted_AES_key = RSA_key.encrypt(AES_key.toString());
+		        	sendMessage(encrypted_AES_key);
+		        	this.aes = new AES(AES_key);
 					ui.send(new DisplayConnectionAcceptedPacket(connectionID));
-				else
-					close();
+        		}
 			} catch (IOException e) {}
-        	// generate 256 bit key
-        	// encrypt 256 bit key with ECC key
-        	// send 256 bit key
-        	// good to go
         }
         try {
             String line;
             while((line = in.readLine()) != null && !finished) {
+            	line = new String(aes.decrypt(line.getBytes()));
                 ui.send(new DisplayMessagePacket(line, connectionID));
             }
             s.close();
@@ -118,7 +140,7 @@ public class Connection extends Thread {
      *  @param message   String to send over the socket
      */
     public void sendMessage(String message) {
-        out.println(message);
+        out.println(aes.encrypt(message.getBytes()));
     }
     
     /**
